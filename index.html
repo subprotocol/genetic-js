@@ -21,16 +21,11 @@
 		}
 		
 		// create random strings that are equal in length to targetString
-		return randomString(this.configuration["targetString"].length);
+		return randomString(this.userData["targetString"].length);
 	};
 	
-	ga.select1 = function(pop) {
-		// pairwise tournament
-		var n = pop.length;
-		var a = pop[Math.floor(Math.random()*n)];
-		var b = pop[Math.floor(Math.random()*n)];
-		return a.fitness > b.fitness ? a.entity : b.entity;
-	}
+	ga.select1 = Genetic.Select1.Tournament;
+	ga.compare = Genetic.Compare.Descending;
 	
 	ga.mutate = function(entity) {
 		
@@ -39,15 +34,8 @@
 		}
 		
 		// chromosomal drift
-		var i = Math.floor(Math.random()*entity.length)
-		
+		var i = Math.floor(Math.random()*entity.length)		
 		return replaceAt(entity, i, String.fromCharCode(entity.charCodeAt(i) + (Math.floor(Math.random()*2) ? 1 : -1)));
-		
-		//var before = entity.toString();
-		//entity[i] = String.fromCharCode(entity.charCodeAt(i) + (Math.floor(Math.random())*2 ? 1 : -1));
-		//entity[0] = 'q';
-		//postMessage(before == entity);
-		//return entity;
 	};
 		
 	ga.fitness = function(entity) {
@@ -56,11 +44,11 @@
 		var i;
 		for (i=0;i<entity.length;++i) {
 			// increase fitness for each character that matches
-			if (entity[i] == this.configuration.targetString[i])
+			if (entity[i] == this.userData.targetString[i])
 				fitness += 1;
 			
 			// award fractions of a point if the ordinal value of characters is close
-			fitness += (127-Math.abs(entity.charCodeAt(i) - this.configuration.targetString.charCodeAt(i)))/50;
+			fitness += (127-Math.abs(entity.charCodeAt(i) - this.userData["targetString"].charCodeAt(i)))/50;
 		}
 
 		return fitness;
@@ -70,10 +58,13 @@
 		"iterations": 4000
 		, "size": 250
 		, "mutation": 0.3
-		, "targetString": "This is a test to see that it works"
 	};
 	
-	ga.evolve(config);
+	var userData = {
+		"targetString": "This is a test to see that it works"
+	};
+	
+	ga.evolve(config, userData);
 	
 	</script>
 	
