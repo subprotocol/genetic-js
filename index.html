@@ -24,8 +24,9 @@
 		return randomString(this.userData["targetString"].length);
 	};
 	
-	ga.select1 = Genetic.Select1.Tournament;
 	ga.optimize = Genetic.Optimize.Maximize;
+	ga.select1 = Genetic.Select1.Tournament;
+	ga.select2 = Genetic.Select2.Tournament;
 	
 	ga.mutate = function(entity) {
 		
