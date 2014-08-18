@@ -56,7 +56,7 @@
 		
 		return [son, daughter];
 	};
-		
+	
 	ga.fitness = function(entity) {
 		var fitness = 0;
 		
@@ -73,9 +73,8 @@
 		return fitness;
 	};
 	
-	ga.generation = function(pop, generation) {
-		
-		postMessage(generation + ": " + pop[0].fitness + " " + pop[0].entity);
+	ga.generation = function(pop, generation, stats) {
+		console.log("avg: " + stats.mean.toPrecision(8) + "  best entity: " + pop[0].entity);
 		
 		// stop running once we've reached the solution
 		return pop[0].entity != this.userData["solution"];
