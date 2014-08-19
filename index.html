@@ -3,7 +3,7 @@
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<title>genetic-js</title>
-	<script src="js/genetic-0.0.1.min.js"></script>
+	<script src="lib/genetic.js"></script>
 
 	<script>
 	
@@ -40,8 +40,8 @@
 	};
 	
 	ga.crossover = function(mother, father) {
+
 		// two-point crossover
-		
 		var len = mother.length;
 		var ca = Math.floor(Math.random()*len);
 		var cb = Math.floor(Math.random()*len);		
@@ -74,10 +74,12 @@
 	};
 	
 	ga.generation = function(pop, generation, stats) {
-		console.log("avg: " + stats.mean.toPrecision(8) + "  best entity: " + pop[0].entity);
-		
 		// stop running once we've reached the solution
 		return pop[0].entity != this.userData["solution"];
+	};
+	
+	ga.notification = function(pop, generation, stats, isFinished) {
+		console.log("avg: " + stats.mean.toPrecision(8) + "  best entity: " + pop[0].entity);
 	};
 	
 	var config = {

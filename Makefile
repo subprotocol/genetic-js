@@ -16,7 +16,7 @@ all:
 	ls -1 js/* | sed 's/^/  /'
 
 test:
-	@echo "running tests"
+	@$(npmbin)/mocha --reporter spec
 
 clean:
 	rm -f js/*.js
