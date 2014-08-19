@@ -38,12 +38,20 @@ var Genetic = Genetic || (function(){
 			var a = pop[Math.floor(Math.random()*n)];
 			var b = pop[Math.floor(Math.random()*n)];
 			return this.optimize(a.fitness, b.fitness) ? a.entity : b.entity;
+		}, "Fittest": function (pop) {
+			return pop[0].entity;
+		}, "Random": function (pop) {
+			return pop[Math.floor(Math.random()*pop.length)].entity;
 		}
 	};
 	
 	var Select2 = {
 		"Tournament": function(pop) {
 			return [Select1.Tournament.call(this, pop), Select1.Tournament.call(this, pop)];
+		}, "Fittest": function (pop) {
+			return [Select1.Fittest.call(this, pop), Select1.Fittest.call(this, pop)];
+		}, "Random": function (pop) {
+			return [Select1.Random.call(this, pop), Select1.Random.call(this, pop)];
 		}
 	};
 	

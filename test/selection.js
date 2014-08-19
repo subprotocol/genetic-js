@@ -26,9 +26,9 @@ describe("Optimize", function() {
 	
 });
 
-describe("Select1", function() {
+describe("Selection", function() {
 	
-	it("Tournament", function (done) {
+	it("Tournament 1", function (done) {
 		ga.optimize = Genetic.Optimize.Maximize;
 		ga.select1 = Genetic.Select1.Tournament;
 		ga.seed = function() {
@@ -50,11 +50,7 @@ describe("Select1", function() {
 		ga.evolve({"iterations": 1, "size": 2}, {"index": 0});
 	});
 	
-});
-
-describe("Select2", function() {
-	
-	it("Tournament", function (done) {
+	it("Tournament 2", function (done) {
 		ga.optimize = Genetic.Optimize.Minimize;
 		ga.select1 = Genetic.Select1.Tournament;
 		ga.select2 = Genetic.Select2.Tournament;
@@ -94,4 +90,78 @@ describe("Select2", function() {
 		ga.evolve(config, {"index": 0});
 	});
 	
+	it("Fittest 1", function (done) {
+		ga.optimize = Genetic.Optimize.Maximize;
+		ga.select1 = Genetic.Select1.Fittest;
+		ga.select2 = Genetic.Select2.Fittest;
+		ga.crossover = function(mother, father) {
+			return [mother, father];
+		};
+		ga.seed = function() {
+			return this.userData["index"]++;
+		};
+		ga.fitness = function(entity) {
+			return entity;
+		};
+		ga.notification = function(pop, generation, stats, isFinished) {
+			assert.equal(pop.length, 30);
+			
+			// validate ordering
+			var i;
+			for (i=1;i<pop.length;++i) {
+				assert.equal(pop[i-1].fitness >= pop[i].fitness, true);
+			}
+
+			// should always return the largest
+			assert.equal(pop[0].entity, pop.length-1);
+
+			if (isFinished) {
+				done();
+			}
+		};
+		var config = {
+			"iterations": 50
+			, "size": 30
+			, "crossover": 1.0
+			, "fittestAlwaysSurvives": false
+		};
+		ga.evolve(config, {"index": 0});
+	});
+	
+	it("Random 1", function (done) {
+		ga.optimize = Genetic.Optimize.Maximize;
+		ga.select1 = Genetic.Select1.Random;
+		ga.select2 = Genetic.Select2.Random;
+		ga.crossover = function(mother, father) {
+			return [mother, father];
+		};
+		ga.seed = function() {
+			return this.userData["index"]++;
+		};
+		ga.fitness = function(entity) {
+			return entity;
+		};
+		ga.notification = function(pop, generation, stats, isFinished) {
+			assert.equal(pop.length, 30);
+			
+			// validate ordering
+			var i;
+			for (i=1;i<pop.length;++i) {
+				assert.equal(pop[i-1].fitness >= pop[i].fitness, true);
+			}
+			
+			if (isFinished) {
+				done();
+			}
+		};
+		var config = {
+			"iterations": 50
+			, "size": 30
+			, "crossover": 1.0
+			, "fittestAlwaysSurvives": false
+		};
+		ga.evolve(config, {"index": 0});
+	});
+
 });
+
