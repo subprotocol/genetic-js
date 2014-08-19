@@ -15,13 +15,13 @@ The optimizer specifies how to rank individuals against each other based on an a
 
 ## Selection
 
-An algorithm can be either genetic or evolutionary depending on which selection operations are used.  Algorithm is evolutionary if it only use a Single (select1) operator¸  If both Single and Pair-wise operations are used (and if crossover is implemented) it is genetic.
+An algorithm can be either genetic or evolutionary depending on which selection operations are used.  An algorithm is evolutionary if it only use a Single (select1) operator¸  If both Single and Pair-wise operations are used (and if crossover is implemented) it is genetic.
 
 
 | Select Type         | Required?   | Description
 | ------------------- | ----------- | -----------
-| select1 (Single)    | Yes         | Selects a single individual for survival from a population.
-| select2 (Pair-wise) | No          | Selects two individuals from a population for mate selection and genetic crossover.
+| select1 (Single)    | Always      | Selects a single individual for survival from a population
+| select2 (Pair-wise) | Optional    | Selects two individuals from a population for mating/crossover
 
 
 ### Selection Operators
