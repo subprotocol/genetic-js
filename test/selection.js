@@ -10,6 +10,42 @@ beforeEach(function () {
 });
 
 
+describe.only("Clone", function() {
+	
+	it("Array", function () {
+		var a1 = [];
+		a1.push([1, 2]);
+		
+		var a2 = a1;
+		a2.push("test");
+		
+		var a3 = Genetic.Clone(a2);
+		
+		assert.equal(a1.length, 2);
+		assert.equal(a2.length, 2);
+		assert.equal(a3.length, 2);
+		
+		a2[0] = "overwritten";
+		assert.equal(a1[0], "overwritten");
+		assert.equal(a2[0], "overwritten");
+		assert.equal(a3[0].join(), [1, 2].join());
+	});
+	
+	it("Object", function () {
+		var obj1 = {};
+		obj1["a"] = true;
+		var obj2 = obj1;
+		var obj3 = Genetic.Clone(obj2);
+		obj2["b"] = false;
+		assert.equal("b" in obj1, true);
+		assert.equal("a" in obj3, true);
+		assert.equal("b" in obj3, false);
+	});
+	
+	
+});
+
+
 describe("Optimize", function() {
 	
 	it("Minimize", function () {
