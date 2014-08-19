@@ -42,6 +42,9 @@ var Genetic = Genetic || (function(){
 			return pop[0].entity;
 		}, "Random": function (pop) {
 			return pop[Math.floor(Math.random()*pop.length)].entity;
+		}, "RandomLinearRank": function (pop) {
+			this.generationState["rlr"] = this.generationState["rlr"]||0;
+			return pop[Math.floor(Math.random()*Math.min(pop.length,(this.generationState["rlr"]++)))].entity;
 		}
 	};
 	
@@ -52,6 +55,8 @@ var Genetic = Genetic || (function(){
 			return [Select1.Fittest.call(this, pop), Select1.Fittest.call(this, pop)];
 		}, "Random": function (pop) {
 			return [Select1.Random.call(this, pop), Select1.Random.call(this, pop)];
+		}, "RandomLinearRank": function (pop) {
+			return [Select1.RandomLinearRank.call(this, pop), Select1.RandomLinearRank.call(this, pop)];
 		}
 	};
 	
@@ -79,6 +84,7 @@ var Genetic = Genetic || (function(){
 		};
 		
 		this.userData = {};
+		this.generationState = {};
 		
 		this.entities = [];
 		
@@ -100,6 +106,9 @@ var Genetic = Genetic || (function(){
 			}
 			
 			for (i=0;i<this.configuration.iterations;++i) {
+				// reset for each generation
+				this.generationState = {};
+				
 				// score and sort
 				var pop = this.entities
 					.map(function (entity) {
