@@ -43,8 +43,11 @@ var Genetic = Genetic || (function(){
 		}, "Random": function (pop) {
 			return pop[Math.floor(Math.random()*pop.length)].entity;
 		}, "RandomLinearRank": function (pop) {
-			this.generationState["rlr"] = this.generationState["rlr"]||0;
-			return pop[Math.floor(Math.random()*Math.min(pop.length,(this.generationState["rlr"]++)))].entity;
+			this.internalGenState["state"] = this.internalGenState["state"]||0;
+			return pop[Math.floor(Math.random()*Math.min(pop.length,(this.internalGenState["state"]++)))].entity;
+		}, "Sequential": function (pop) {
+			this.internalGenState["state"] = this.internalGenState["state"]||0;
+			return pop[(this.internalGenState["state"]++)%pop.length].entity;
 		}
 	};
 	
@@ -57,6 +60,8 @@ var Genetic = Genetic || (function(){
 			return [Select1.Random.call(this, pop), Select1.Random.call(this, pop)];
 		}, "RandomLinearRank": function (pop) {
 			return [Select1.RandomLinearRank.call(this, pop), Select1.RandomLinearRank.call(this, pop)];
+		}, "Sequential": function (pop) {
+			return [Select1.Sequential.call(this, pop), Select1.Sequential.call(this, pop)];
 		}
 	};
 	
@@ -84,7 +89,7 @@ var Genetic = Genetic || (function(){
 		};
 		
 		this.userData = {};
-		this.generationState = {};
+		this.internalGenState = {};
 		
 		this.entities = [];
 		
@@ -107,7 +112,7 @@ var Genetic = Genetic || (function(){
 			
 			for (i=0;i<this.configuration.iterations;++i) {
 				// reset for each generation
-				this.generationState = {};
+				this.internalGenState = {};
 				
 				// score and sort
 				var pop = this.entities

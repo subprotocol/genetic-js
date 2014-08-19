@@ -198,6 +198,50 @@ describe("Selection", function() {
 		};
 		ga.evolve(config, {"index": 0});
 	});
+	
+	it("Sequential", function (done) {
+		ga.optimize = Genetic.Optimize.Maximize;
+		ga.select1 = Genetic.Select1.Sequential;
+		ga.select2 = Genetic.Select2.Sequential;
+		ga.crossover = function(mother, father) {
+			return [ga.optimize(mother, father) ? mother : father, ga.optimize(mother, father) ? mother : father];
+		};
+		ga.seed = function() {
+			return this.userData["index"]++;
+		};
+		ga.fitness = function(entity) {
+			return entity;
+		};
+		ga.notification = function(pop, generation, stats, isFinished) {
+			assert.equal(pop.length, 30);
+			
+			// validate ordering
+			var i;
+			for (i=1;i<pop.length;++i) {
+				assert.equal(pop[i-1].fitness >= pop[i].fitness, true);
+			}
+			
+			if (isFinished) {
+				for (i=1;i<pop.length;i+=2) {
+					assert.equal(pop[i-1].fitness == pop[i].fitness, true);
+				}
+				
+				for (i=0;i<pop.length;++i) {
+					// should only see odd values
+					assert.equal(pop[i].fitness%2, 1);
+				}
+				
+				done();
+			}
+		};
+		var config = {
+			"iterations": 50
+			, "size": 30
+			, "crossover": 1.0
+			, "fittestAlwaysSurvives": false
+		};
+		ga.evolve(config, {"index": 0});
+	});
 
 });
 
