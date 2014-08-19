@@ -28,32 +28,10 @@ describe("Optimize", function() {
 
 describe("Selection", function() {
 	
-	it("Tournament 1", function (done) {
-		ga.optimize = Genetic.Optimize.Maximize;
-		ga.select1 = Genetic.Select1.Tournament;
-		ga.seed = function() {
-			return this.userData["index"]++;
-		};
-		ga.fitness = function(entity) {
-			return entity;
-		};
-		ga.notification = function(pop, generation, stats, isFinished) {
-			assert.equal(pop.length, 2);
-			assert.equal(pop[0].entity, 1);
-			assert.equal(pop[1].entity, 0);
-			var entity = this.select1(pop);
-			assert.equal(entity == 0 || entity == 1, true);
-			if (isFinished) {
-				done();
-			}
-		};
-		ga.evolve({"iterations": 1, "size": 2}, {"index": 0});
-	});
-	
-	it("Tournament 2", function (done) {
+	it("Tournament2", function (done) {
 		ga.optimize = Genetic.Optimize.Minimize;
-		ga.select1 = Genetic.Select1.Tournament;
-		ga.select2 = Genetic.Select2.Tournament;
+		ga.select1 = Genetic.Select1.Tournament2;
+		ga.select2 = Genetic.Select2.Tournament2;
 		ga.crossover = function(mother, father) {
 			return [mother, father];
 		};
@@ -90,10 +68,10 @@ describe("Selection", function() {
 		ga.evolve(config, {"index": 0});
 	});
 	
-	it("Fittest", function (done) {
+	it("Tournament3", function (done) {
 		ga.optimize = Genetic.Optimize.Maximize;
-		ga.select1 = Genetic.Select1.Fittest;
-		ga.select2 = Genetic.Select2.Fittest;
+		ga.select1 = Genetic.Select1.Tournament3;
+		ga.select2 = Genetic.Select2.Tournament3;
 		ga.crossover = function(mother, father) {
 			return [mother, father];
 		};
@@ -111,9 +89,6 @@ describe("Selection", function() {
 			for (i=1;i<pop.length;++i) {
 				assert.equal(pop[i-1].fitness >= pop[i].fitness, true);
 			}
-
-			// should always return the largest
-			assert.equal(pop[0].entity, pop.length-1);
 
 			if (isFinished) {
 				done();
@@ -187,6 +162,44 @@ describe("Selection", function() {
 			
 			if (isFinished) {
 				assert.equal(pop[0].entity, 0);
+				done();
+			}
+		};
+		var config = {
+			"iterations": 50
+			, "size": 30
+			, "crossover": 1.0
+			, "fittestAlwaysSurvives": false
+		};
+		ga.evolve(config, {"index": 0});
+	});
+	
+	it("FittestRandom", function (done) {
+		ga.optimize = Genetic.Optimize.Maximize;
+		ga.select1 = Genetic.Select1.RandomLinearRank;
+		ga.select2 = Genetic.Select2.FittestRandom;
+		ga.crossover = function(mother, father) {
+			return [mother, father];
+		};
+		ga.seed = function() {
+			return this.userData["index"]++;
+		};
+		ga.fitness = function(entity) {
+			return entity;
+		};
+		ga.notification = function(pop, generation, stats, isFinished) {
+			assert.equal(pop.length, 30);
+			
+			// validate ordering
+			var i;
+			for (i=1;i<pop.length;++i) {
+				assert.equal(pop[i-1].fitness >= pop[i].fitness, true);
+			}
+
+			// should always return the largest
+			assert.equal(pop[0].entity, pop.length-1);
+
+			if (isFinished) {
 				done();
 			}
 		};

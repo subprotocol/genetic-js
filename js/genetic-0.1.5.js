@@ -32,36 +32,45 @@ var Genetic = Genetic || (function(){
 	};
 	
 	var Select1 = {
-		"Tournament": function(pop) {
-			// pairwise tournament
+		"Tournament2": function(pop) {
 			var n = pop.length;
 			var a = pop[Math.floor(Math.random()*n)];
 			var b = pop[Math.floor(Math.random()*n)];
 			return this.optimize(a.fitness, b.fitness) ? a.entity : b.entity;
+		}, "Tournament3": function(pop) {
+			var n = pop.length;
+			var a = pop[Math.floor(Math.random()*n)];
+			var b = pop[Math.floor(Math.random()*n)];
+			var c = pop[Math.floor(Math.random()*n)];
+			var best = this.optimize(a.fitness, b.fitness) ? a : b;
+			best = this.optimize(best.fitness, c.fitness) ? best : c;
+			return best.entity;
 		}, "Fittest": function (pop) {
 			return pop[0].entity;
 		}, "Random": function (pop) {
 			return pop[Math.floor(Math.random()*pop.length)].entity;
 		}, "RandomLinearRank": function (pop) {
-			this.internalGenState["state"] = this.internalGenState["state"]||0;
-			return pop[Math.floor(Math.random()*Math.min(pop.length,(this.internalGenState["state"]++)))].entity;
+			this.internalGenState["rlr"] = this.internalGenState["rlr"]||0;
+			return pop[Math.floor(Math.random()*Math.min(pop.length,(this.internalGenState["rlr"]++)))].entity;
 		}, "Sequential": function (pop) {
-			this.internalGenState["state"] = this.internalGenState["state"]||0;
-			return pop[(this.internalGenState["state"]++)%pop.length].entity;
+			this.internalGenState["seq"] = this.internalGenState["seq"]||0;
+			return pop[(this.internalGenState["seq"]++)%pop.length].entity;
 		}
 	};
 	
 	var Select2 = {
-		"Tournament": function(pop) {
-			return [Select1.Tournament.call(this, pop), Select1.Tournament.call(this, pop)];
-		}, "Fittest": function (pop) {
-			return [Select1.Fittest.call(this, pop), Select1.Fittest.call(this, pop)];
+		"Tournament2": function(pop) {
+			return [Select1.Tournament2.call(this, pop), Select1.Tournament2.call(this, pop)];
+		}, "Tournament3": function(pop) {
+			return [Select1.Tournament3.call(this, pop), Select1.Tournament3.call(this, pop)];
 		}, "Random": function (pop) {
 			return [Select1.Random.call(this, pop), Select1.Random.call(this, pop)];
 		}, "RandomLinearRank": function (pop) {
 			return [Select1.RandomLinearRank.call(this, pop), Select1.RandomLinearRank.call(this, pop)];
 		}, "Sequential": function (pop) {
 			return [Select1.Sequential.call(this, pop), Select1.Sequential.call(this, pop)];
+		}, "FittestRandom": function (pop) {
+			return [Select1.Fittest.call(this, pop), Select1.Random.call(this, pop)];
 		}
 	};
 	

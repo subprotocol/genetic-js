@@ -1,7 +1,7 @@
 {
   "name": "genetic-js",
-  "version": "0.1.4",
-  "description": "Genetic algorithm library",
+  "version": "0.1.5",
+  "description": "Advanced genetic and evolutionary algorithm library",
   "main": "lib/genetic.js",
   "scripts": {
     "test": "make test"
