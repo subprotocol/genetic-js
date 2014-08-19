@@ -1,0 +1,16 @@
+{
+  "name": "genetic-js",
+  "version": "0.0.1",
+  "description": "Genetic algorithm library",
+  "main": "lib/genetic.js",
+  "scripts": {
+    "test": "make test"
+  },
+  "author": "subprotocol <smprotocol@gmail.com> (http://subprotocol.com/)",
+  "license": "BSD",
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "browserify": "~5.10.0",
+    "uglify-js": "~2.4.15"
+  }
+}
