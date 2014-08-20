@@ -7,7 +7,7 @@ Advanced genetic and evolutionary algorithm library written in Javascript by [Su
 
 The existing Javascript GA/EP library landscape could collectively be summed up as, meh. All that I required to take over the world was a lightweight, performant, feature-rich, nodejs + browser compatible, unit tested, and easily hackable GA/EP library.  Seamless [Web Worker](http://en.wikipedia.org/wiki/Web_worker) support would be the icing on my cake.
 
-Until now, no such thing existed. Now to can have your cake, and optimize it too. Is it perfect? *Probably*. Regardless, this library is my gift to you.
+Until now, no such thing existed. Now you can have your cake, and optimize it too. Is it perfect? *Probably*. Regardless, this library is my gift to you.
 
 Have fun optimizing all your optimizations!
 
