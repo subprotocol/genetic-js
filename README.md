@@ -1,6 +1,6 @@
 # genetic-js
 
-Advanced genetic and evolutionary algorithm library written in Javascript, by [Sub Protocol](http://subprotocol.com/).
+Advanced genetic and evolutionary algorithm library written in Javascript by [Sub Protocol](http://subprotocol.com/).
 
 
 #### Rational
@@ -10,9 +10,6 @@ The existing Javascript GA/EP library landscape could collectively be summed up 
 Until now, no such thing existed. Now to can have your cake, and optimize it too. Is it perfect? *Probably*. Regardless, this library is my gift to you.
 
 Have fun optimizing all your optimizations!
-
-- sm
-
 
 
 ## Population Functions
