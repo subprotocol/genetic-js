@@ -26,6 +26,13 @@ var Genetic = Genetic || (function(){
 		}
 	};
 	
+	var Clone = function(obj) {
+		if (obj == null || typeof obj != "object")
+			return obj;
+		
+		return JSON.parse(JSON.stringify(obj));
+	};
+	
 	var Optimize = {
 		"Maximize": function (a, b) { return a >= b; }
 		, "Minimize": function (a, b) { return a < b; }
@@ -111,12 +118,12 @@ var Genetic = Genetic || (function(){
 			
 			function mutateOrNot(entity) {
 				// applies mutation based on mutation probability
-				return Math.random() <= self.configuration.mutation && self.mutate ? self.mutate(entity) : entity;
+				return Math.random() <= self.configuration.mutation && self.mutate ? self.mutate(Clone(entity)) : entity;
 			}
 			
 			// seed the population
 			for (i=0;i<this.configuration.size;++i)  {
-				this.entities.push(this.seed());
+				this.entities.push(Clone(this.seed()));
 			}
 			
 			for (i=0;i<this.configuration.iterations;++i) {
@@ -157,7 +164,7 @@ var Genetic = Genetic || (function(){
 				// crossover and mutate
 				var newPop = [];
 				
-				if (this.fittestAlwaysSurvives) // lets the best solution fall through
+				if (this.configuration.fittestAlwaysSurvives) // lets the best solution fall through
 					newPop.push(pop[0].entity);
 				
 				while (newPop.length < self.configuration.size) {
@@ -167,7 +174,7 @@ var Genetic = Genetic || (function(){
 						&& newPop.length+1 < self.configuration.size // keeps us from going 1 over the max population size
 					) {
 						var parents = this.select2(pop);
-						var children = this.crossover(parents[0], parents[1]).map(mutateOrNot);
+						var children = this.crossover(Clone(parents[0]), Clone(parents[1])).map(mutateOrNot);
 						newPop.push(children[0], children[1]);
 					} else {
 						newPop.push(mutateOrNot(self.select1(pop)));
@@ -222,6 +229,7 @@ var Genetic = Genetic || (function(){
 		// bootstrap webworker script
 		var blobScript = "'use strict'\n";
 		blobScript += "var Serialization = {'stringify': " + Serialization.stringify.toString() + ", 'parse': " + Serialization.parse.toString() + "};\n";
+		blobScript += "var Clone = " + Clone.toString() + ";\n";
 		
 		// make available in webworker
 		blobScript += "var Optimize = Serialization.parse(\"" + addslashes(Serialization.stringify(Optimize)) + "\");\n";
@@ -262,6 +270,7 @@ var Genetic = Genetic || (function(){
 		}, "Select1": Select1
 		, "Select2": Select2
 		, "Optimize": Optimize
+		, "Clone": Clone
 	};
 	
 })();

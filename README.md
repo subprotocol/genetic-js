@@ -1,6 +1,23 @@
 # genetic-js
 
-Advanced genetic and evolutionary algorithm library written in Javascript by [Subprotocol](http://subprotocol.com/).  Works with nodejs and in the browser. Web workers are used when available!
+Advanced genetic and evolutionary algorithm library written in Javascript, by [Sub Protocol](http://subprotocol.com/).  Works with nodejs and in the browser. When available [Web Workers](http://en.wikipedia.org/wiki/Web_worker) are used.
+
+
+## Population Functions
+
+The genetic-js interface exposes a few simple primitives, you just fill in the details/features you want to use.
+		
+| Function                                  | Return Type              | Required   | Description
+| ----------------------------------------- | ------------------------ | ---------- | -----------
+| seed()                                    | Individual               | Yes        | Called to create an individual, can be of any type (int, float, string, array, object)
+| fitness(individual)                       | Float                    | Yes        | Computes a fitness score for an individual
+| mutate(individual)                        | Individual               | Optional   | Called when an individual has been selected for mutation
+| crossover(mother, father)                 | [Son, Daughter]          | Optional   | Called when two individuals are selected for mating. Two children should always returned
+| optimize(fitness, fitness)                | Boolean                  | Yes        | Determines if the first fitness score is better than the second. [Optimizer](#optimizer)
+| select1(population)                       | Individual               | Yes        | See [Selection](#selection) section below
+| select2(population)                       | Individual               | Optional   | Selects a pair of individuals from a population. [Selection](#selection)
+| generation(pop, gen, stats)               | Boolean                  | Optional   | Called for each generation.  Return false to terminate end algorithm (ie- if goal state is reached)
+| notification(pop, gen, stats, isFinished) | Void                     | Optional   | Runs in the calling context. All functions other than are run in a web worker.
 
 
 ## Optimizer
@@ -18,9 +35,9 @@ The optimizer specifies how to rank individuals against each other based on an a
 An algorithm can be either genetic or evolutionary depending on which selection operations are used.  An algorithm is evolutionary if it only use a Single (select1) operator¸  If both Single and Pair-wise operations are used (and if crossover is implemented) it is genetic.
 
 
-| Select Type         | Required?   | Description
+| Select Type         | Required    | Description
 | ------------------- | ----------- | -----------
-| select1 (Single)    | Always      | Selects a single individual for survival from a population
+| select1 (Single)    | Yes         | Selects a single individual for survival from a population
 | select2 (Pair-wise) | Optional    | Selects two individuals from a population for mating/crossover
 
 
@@ -56,11 +73,6 @@ ga.select2 = Genetic.Select2.FittestRandom;
 
 // ...
 ```
-
-## Population Operators
-
-TODO: add
-
 
 ## Configuration Parameters
 
