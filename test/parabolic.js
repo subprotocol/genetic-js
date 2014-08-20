@@ -105,7 +105,7 @@ function solveTest(sel1, sel2, config) {
 	});
 }
 
-describe("Genetic Parabola Solver", function() {
+describe("Genetic Parabolic Solver", function() {
 	
 	var config = {
 		"iterations": 1000
