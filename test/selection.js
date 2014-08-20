@@ -10,7 +10,7 @@ beforeEach(function () {
 });
 
 
-describe.only("Clone", function() {
+describe("Clone", function() {
 	
 	it("Array", function () {
 		var a1 = [];

@@ -71,7 +71,7 @@ beforeEach(function () {
 
 
 function solveTest(sel1, sel2, config) {
-	it(sel1 + ", " + sel2, function (done) {		
+	it(sel1 + ", " + sel2, function (done) {
 		ga.select1 = eval(sel1);
 		ga.select2 = eval(sel2);
 		ga.notification = function(pop, generation, stats, isFinished) {
@@ -89,11 +89,11 @@ function solveTest(sel1, sel2, config) {
 	});
 }
 
-describe("Genetic", function() {
+describe("Genetic String Solver", function() {
 	
 	var config = {
 		"iterations": 2000
-		, "size": 100
+		, "size": 20
 		, "crossover": 0.4
 		, "mutation": 0.3
 	};
@@ -102,10 +102,6 @@ describe("Genetic", function() {
 	var k;
 	for (k in Genetic.Select1) {
 		for (j in Genetic.Select2) {
-			// ignore inefficient combinations
-			if (j == k && (k == "Random" || k == "Sequential"))
-				continue;
-				
 			solveTest("Genetic.Select1."+k, "Genetic.Select2."+j, config);
 		}
 	};
