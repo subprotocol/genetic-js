@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<title>genetic-js</title>
+	<script src="lib/genetic.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+</head>
+<body>
+
+
+
+Dataset:
+<select id="dataset">
+<option value="clear">Clear</option>
+<option value="parabola">Parabola</option>
+<option value="linear">Linear (with noise)</option>
+<option value="sinusoidal">Sinusoidal (with noise)</option>
+</select>
+
+Degree:
+<input id="degree" type="input" value="2" />
+
+<button id="solve">Solve</button>
+
+<canvas id="scratch" style="width: 800px; height: 500px; cursor: crosshair;"></canvas>
+
+<script>
+
+
+
+var graph = new Graph(document.getElementById("scratch"), 10, 10);
+graph.vertices.push([0,0]);
+graph.vertices.push([4,4]);
+graph.vertices.push([8,0]);
+
+
+
+
+var ga = Genetic.create();
+
+ga.optimize = Genetic.Optimize.Minimize;
+ga.select1 = Genetic.Select1.Tournament2;
+ga.select2 = Genetic.Select2.FittestRandom;
+
+ga.seed = function() {
+	
+	var a = [];
+	// create coefficients for polynomial with values between (-0.5, 0.5)
+	
+	var i;
+	for (i=0;i<this.userData["terms"];++i) {
+		a.push(Math.random()-0.5);
+	}
+	
+	return a;
+};
+
+ga.mutate = function(entity) {
+	
+	// allow chromosomal drift with this range (-0.05, 0.05)
+	var drift = ((Math.random()-0.5)*2)*0.05;
+	
+	var i = Math.floor(Math.random()*entity.length);
+	entity[i] += drift;
+	
+	return entity;
+};
+
+ga.crossover = function(mother, father) {
+
+	// crossover via interpolation
+	function lerp(a, b, p) {
+		return a + (b-a)*p;
+	}
+	
+	var len = mother.length;
+	var i = Math.floor(Math.random()*len);
+	var r = Math.random();
+	var son = [].concat(father);
+	var daughter = [].concat(mother);
+	
+	son[i] = lerp(father[i], mother[i], r);
+	daughter[i] = lerp(mother[i], father[i], r);
+	
+	return [son, daughter];
+};
+
+// example 3 term polynomial: cx^0 + bx^1 + ax^2
+ga.evaluatePoly = function(coefficients, x) {
+	var s = 0;
+	var p = 1;
+	var i;
+	for (i=0;i<coefficients.length;++i) {
+		s += p*coefficients[i];
+		p *= x;
+	}
+	 
+	return s;
+}
+	
+ga.fitness = function(entity) {
+	
+	var sumSqErr = 0;
+	var vertices = this.userData["vertices"];
+	
+	var i;
+	for (i=0;i<vertices.length;++i) {
+		var err = this.evaluatePoly(entity, vertices[i][0]) - vertices[i][1];
+		sumSqErr += err*err;
+	}
+	
+	return Math.sqrt(sumSqErr);
+};
+
+
+ga.generation = function(pop, generation, stats) {
+};
+
+ga.notification = function(pop, generation, stats, isFinished) {
+	/*console.log(generation + "  stddev(" + stats.stdev.toPrecision(6) + ")  avg(" + stats.mean.toPrecision(6) + ")  best entity(" + pop[0].fitness.toPrecision(6) + ")");
+	
+	function poly(entity) {
+		var a = [];
+		var i;
+		for (i=entity.length-1;i>=0;--i) {
+			a.push(entity[i] + "(x^" + i + ")");
+		}
+		return a.join(" + ");
+	}
+	
+	if (isFinished) {	
+		console.log(poly(pop[0].entity));
+	}*/
+	
+	function lerp(a, b, p) {
+		return a + (b-a)*p;
+	}
+	
+	if (generation == 0) {
+		graph.solutions = [];
+	}
+	
+	graph.draw();
+	graph.solutions.push(pop[0].entity);
+	
+	
+	var i;
+	for (i=0;i<graph.solutions.length;++i) {
+		var p = i/graph.solutions.length;
+		
+		var r = Math.round(lerp(0,255,p));
+		var g = Math.round(lerp(0,255,0));
+		var b = Math.round(lerp(100,255,1-p));
+		var alpha = p;
+		var strokeStyle = "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
+		var lineWidth = Math.floor(lerp(10,1,p));
+
+		
+		//var strokeStyle = i == graph.solutions.length-1 ? "#00f" : "rgba(0,0,0,0.1)";
+		graph.drawFunction(graph.solutions[i], strokeStyle, lineWidth);
+	}
+	
+	
+	graph.drawVertices();
+	
+	
+};
+
+
+
+
+function Graph(canvas, xmax, ymax) {
+	this.canvas = document.getElementById("scratch");
+	
+	this.xmax = xmax;
+	this.ymax = ymax;
+	
+	// canvas dimensions
+	this.width = parseInt(canvas.style.width);
+	this.height = parseInt(canvas.style.height);
+
+	// retina
+	var dpr = window.devicePixelRatio || 1;
+	canvas.width = this.width*dpr;
+	canvas.height = this.height*dpr;
+	this.ctx = canvas.getContext("2d");
+	this.ctx.scale(dpr, dpr);
+	
+	
+	this.bound = [0,this.width-1,this.height-1,0];
+	
+	this.bound[0] += 25;
+	this.bound[1] -= 25;
+	this.bound[2] -= 25;
+	this.bound[3] += 25;
+	
+	this.vertices = [];
+	this.solutions = [];
+}
+
+Graph.prototype.drawFunction = function(coefficients, strokeStyle, lineWidth) {
+	var ctx = this.ctx;
+	ctx.save();
+	var bound = this.bound;
+	
+	ctx.strokeStyle = strokeStyle;
+	var xmax = this.xmax;
+	var ymax = this.ymax;
+	var xstride = (bound[1]-bound[3])/xmax;
+	var ystride = (bound[2]-bound[0])/ymax;
+	var inc = 1/xstride;
+	
+	ctx.lineWidth = lineWidth;
+	
+	ctx.beginPath();
+	var x;
+	for (x=0;x<xmax;x+=inc) {
+		var cx = x*xstride + bound[3];
+		var cy = bound[2] - ga.evaluatePoly(coefficients, x)*ystride;
+		
+		if (x == 0) {
+			ctx.moveTo(cx, cy);
+		} else {
+			ctx.lineTo(cx, cy);
+		}
+	}
+	
+	ctx.stroke();
+	
+	ctx.restore();
+}
+
+Graph.prototype.draw = function() {
+	
+	
+	var ctx = this.ctx;
+	ctx.save();
+	var bound = this.bound;
+	
+	ctx.strokeStyle = "#000";
+	ctx.fillStyle = "#000";
+	ctx.clearRect(0, 0, this.width, this.height);
+	
+	var xmax = this.xmax;
+	var ymax = this.ymax;
+	var xstride = (bound[1]-bound[3])/xmax;
+	var ystride = (bound[2]-bound[0])/ymax;
+	
+	
+	var i;
+
+	// x-grid
+	for (i=0;i<=xmax;++i) {
+		var cx = i*xstride + bound[3];
+		var y = bound[2];
+		
+		ctx.strokeStyle = "#eee";
+		ctx.beginPath();
+		ctx.moveTo(cx, bound[0]);
+		ctx.lineTo(cx, y);
+		ctx.stroke();
+	}
+	
+	// y-grid
+	for (i=0;i<=ymax;++i) {
+		var cx = bound[3];
+		var y = bound[2] - i*ystride;
+		ctx.beginPath();
+		ctx.moveTo(cx, y);
+		ctx.lineTo(bound[1], y);
+		ctx.stroke();
+	}
+	
+	
+	// x/y bars
+	ctx.beginPath();
+	ctx.strokeStyle = "#bbb";
+	ctx.moveTo(bound[3], bound[0]);
+	ctx.lineTo(bound[3], bound[2]);
+	ctx.lineTo(bound[1], bound[2]);
+	ctx.lineWidth = 3;
+	ctx.stroke();
+	
+
+	ctx.lineWidth = 1;
+	var i;
+	
+	
+	// x bars
+	ctx.strokeStyle = "#000";
+	for (i=0;i<=xmax;++i) {
+		var cx = i*xstride + bound[3];
+		var y = bound[2];
+		
+		ctx.beginPath();
+		ctx.moveTo(cx, y);
+		ctx.lineTo(cx, y+4);
+		ctx.stroke();
+		
+		ctx.font = "12px sans-serif";
+		ctx.textAlign = "center";
+		ctx.fillText(i,cx,y+16);
+	}
+	
+
+	// y bars
+	for (i=0;i<=ymax;++i) {
+		var cx = bound[3];
+		var y = bound[2] - i*ystride;
+		ctx.beginPath();
+		ctx.moveTo(cx, y);
+		ctx.lineTo(cx-4, y);
+		ctx.stroke();
+		
+		ctx.font = "12px sans-serif";
+		ctx.textAlign = "right";
+		ctx.fillText(i,cx-8,y+4);
+	}
+	
+		
+	ctx.restore();
+};
+
+
+
+Graph.prototype.drawVertices = function() {
+	
+	var ctx = this.ctx;
+	ctx.save();
+	var bound = this.bound;
+	
+	var xmax = this.xmax;
+	var ymax = this.ymax;
+	var xstride = (bound[1]-bound[3])/xmax;
+	var ystride = (bound[2]-bound[0])/ymax;
+	
+	var i;
+	
+	ctx.fillStyle = "#000";
+	ctx.strokeStyle = "#fff";
+	ctx.lineWidth = 2;
+	
+	// vertices
+	for (i=0;i<this.vertices.length;++i) {
+		var cx = this.vertices[i][0]*xstride + bound[3];
+		var cy = bound[2] - this.vertices[i][1]*ystride;
+		
+		ctx.beginPath();
+		ctx.arc(cx, cy, 3, 0, 2*Math.PI);
+		ctx.fill();
+		ctx.stroke();
+	}
+	
+	ctx.restore();
+};
+
+
+$(document).ready(function () {
+	
+	
+	$("#scratch").click(function (e) {
+		
+		var bound = graph.bound;
+	
+		var xmax = graph.xmax;
+		var ymax = graph.ymax;
+		var xstride = (bound[1]-bound[3])/xmax;
+		var ystride = (bound[2]-bound[0])/ymax;
+		
+		var x = (e.offsetX || e.clientX - $(e.target).offset().left);
+		var y = (e.offsetY || e.clientY - $(e.target).offset().top);
+		
+		var cx = ((x - bound[3])/(bound[1]-bound[3]))*xmax;
+		var cy = ymax - ((y - bound[0])/(bound[2]-bound[0]))*ymax;
+		
+		graph.vertices.push([cx, cy]);
+		
+		graph.draw();
+		graph.drawVertices();
+	});
+	
+	$("#solve").click(function () {
+		var config = {
+			"iterations": 100
+			, "size": 250
+			, "crossover": 0.3
+			, "mutation": 1.0
+		};
+
+		var userData = {
+			"terms": parseInt($("#degree").val())+1
+			, "vertices": graph.vertices
+		};
+
+		ga.evolve(config, userData);
+	});
+	
+
+	graph.draw();
+	graph.drawVertices();
+});
+
+
+
+</script>
+	
+
+	
+	
+</body>
+</html>
