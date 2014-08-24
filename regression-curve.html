@@ -12,6 +12,7 @@
 
 Dataset:
 <select id="dataset">
+<option value=""> - Choose - </option>
 <option value="clear">Clear</option>
 <option value="parabola">Parabola</option>
 <option value="linear">Linear (with noise)</option>
@@ -19,22 +20,28 @@ Dataset:
 </select>
 
 Degree:
-<input id="degree" type="input" value="2" />
+<select id="degree">
+<option class="1">0 (constant)</option>
+<option class="2">1 (line)</option>
+<option class="3">2 (parabola)</option>
+<option class="4">3 (polynomial)</option>
+</select>
 
 <button id="solve">Solve</button>
+
+<div>
+	Solution: <span id="solution">Press 'Solve'</span>
+</div>
+<div>
+	Generation: <span id="generation">0</span>
+</div>
 
 <canvas id="scratch" style="width: 800px; height: 500px; cursor: crosshair;"></canvas>
 
 <script>
 
 
-
 var graph = new Graph(document.getElementById("scratch"), 10, 10);
-graph.vertices.push([0,0]);
-graph.vertices.push([4,4]);
-graph.vertices.push([8,0]);
-
-
 
 
 var ga = Genetic.create();
@@ -50,7 +57,7 @@ ga.seed = function() {
 	
 	var i;
 	for (i=0;i<this.userData["terms"];++i) {
-		a.push(Math.random()-0.5);
+		a.push(Math.random()-0.01);
 	}
 	
 	return a;
@@ -118,20 +125,16 @@ ga.generation = function(pop, generation, stats) {
 };
 
 ga.notification = function(pop, generation, stats, isFinished) {
-	/*console.log(generation + "  stddev(" + stats.stdev.toPrecision(6) + ")  avg(" + stats.mean.toPrecision(6) + ")  best entity(" + pop[0].fitness.toPrecision(6) + ")");
+	//console.log(generation + "  stddev(" + stats.stdev.toPrecision(6) + ")  avg(" + stats.mean.toPrecision(6) + ")  best entity(" + pop[0].fitness.toPrecision(6) + ")");
 	
 	function poly(entity) {
 		var a = [];
 		var i;
 		for (i=entity.length-1;i>=0;--i) {
-			a.push(entity[i] + "(x^" + i + ")");
+			a.push(entity[i].toPrecision(2) + "<em><b>x<sup>" + i + "<sup></b></em>");
 		}
 		return a.join(" + ");
 	}
-	
-	if (isFinished) {	
-		console.log(poly(pop[0].entity));
-	}*/
 	
 	function lerp(a, b, p) {
 		return a + (b-a)*p;
@@ -141,30 +144,45 @@ ga.notification = function(pop, generation, stats, isFinished) {
 		graph.solutions = [];
 	}
 	
-	graph.draw();
-	graph.solutions.push(pop[0].entity);
 	
+	var last = graph.last||"";
 	
-	var i;
-	for (i=0;i<graph.solutions.length;++i) {
-		var p = i/graph.solutions.length;
+	var str = pop[0].entity.join(",");
+	if (last != str || isFinished) {
 		
-		var r = Math.round(lerp(0,255,p));
-		var g = Math.round(lerp(0,255,0));
-		var b = Math.round(lerp(100,255,1-p));
-		var alpha = p;
-		var strokeStyle = "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
-		var lineWidth = Math.floor(lerp(10,1,p));
+		if (last != str) {
+			graph.solutions.push(pop[0].entity);
+			graph.last = str;
+		}
+		
+		$("#solution").html(poly(pop[0].entity));
+		$("#generation").html(generation+1);
+
+		graph.draw();
+		
+		var i;
+		var start = Math.max(0, graph.solutions.length-10);
+		if (isFinished) {
+			start = 0;
+		}
+		for (i=start;i<graph.solutions.length;++i) {
+			var p = (i-start)/(graph.solutions.length-start);
+		
+			var r = Math.round(lerp(90,255,p));
+			var g = Math.round(lerp(0,255,0));
+			var b = Math.round(lerp(200,50,p));
+			var alpha = p;
+			var strokeStyle = "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
+			var lineWidth = Math.floor(lerp(10,1,p));
 
 		
-		//var strokeStyle = i == graph.solutions.length-1 ? "#00f" : "rgba(0,0,0,0.1)";
-		graph.drawFunction(graph.solutions[i], strokeStyle, lineWidth);
+			//var strokeStyle = i == graph.solutions.length-1 ? "#00f" : "rgba(0,0,0,0.1)";
+			graph.drawFunction(graph.solutions[i], strokeStyle, lineWidth);
+		}
+	
+	
+		graph.drawVertices();
 	}
-	
-	
-	graph.drawVertices();
-	
-	
 };
 
 
@@ -382,7 +400,7 @@ $(document).ready(function () {
 	
 	$("#solve").click(function () {
 		var config = {
-			"iterations": 100
+			"iterations": 250
 			, "size": 250
 			, "crossover": 0.3
 			, "mutation": 1.0
@@ -394,6 +412,42 @@ $(document).ready(function () {
 		};
 
 		ga.evolve(config, userData);
+	});
+	
+	$("#dataset").change(function () {
+		var v = $(this).val();
+		if (v == "") {
+			return;
+		} else if (v == "clear") {
+			graph.vertices = [];
+		} else if (v == "parabola") {
+			graph.vertices = [];
+			graph.vertices.push([2,2]);
+			graph.vertices.push([5,8]);
+			graph.vertices.push([8,2]);
+		} else if (v == "linear") {
+			graph.vertices = [];
+			var x;
+			var b = Math.random()*3;
+			var m = Math.random();
+			var n = 50;
+			for (i=0;i<n;++i) {
+				var cx = Math.random()*10;
+				var cy = m*cx + b + (Math.random()-0.5)*2;
+				graph.vertices.push([cx,cy]);
+			}
+		} else if (v == "sinusoidal") {
+			graph.vertices = [];
+			var n = 20;
+			var stride = 10/n;
+			var i;
+			for (i=0;i<n;++i) {
+				graph.vertices.push([i*stride,Math.sin((i/n)*2*3.1415627)*3 + 5]);
+			}
+		}
+		
+		graph.draw();
+		graph.drawVertices();
 	});
 	
 
