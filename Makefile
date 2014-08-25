@@ -1,14 +1,13 @@
-.PHONY: all check clean distclean
+.PHONY: all check clean distclean distcheck
 
 
 version := $(shell node -e "console.log(require('./package.json').version)")
 npmbin := $(shell npm bin)
 
 
-all:
+all: clean
 	@echo "building: $(version)";                            \
 	npm install;                                             \
-	rm -f js/*.js;                                           \
 	$(npmbin)/browserify lib/dist.js                         \
 	  | tee ./js/genetic-$(version).js                       \
 	  | $(npmbin)/uglifyjs > ./js/genetic-$(version).min.js; \
@@ -18,9 +17,10 @@ all:
 check:
 	@$(npmbin)/mocha --reporter spec
 
+distcheck: check all
+
 clean:
 	rm -f js/*.js
 	
-distclean:
-	rm -f js/*.js
+distclean: clean
 	rm -rf node_modules

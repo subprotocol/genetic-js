@@ -3,10 +3,10 @@ var Genetic = require("../lib/genetic");
 var assert = require("assert");
 
 
-var ga;
+var genetic;
 
 beforeEach(function () {
-	ga = Genetic.create();
+	genetic = Genetic.create();
 });
 
 describe("Clone", function() {
@@ -64,19 +64,19 @@ describe("Optimize", function() {
 describe("Selection", function() {
 	
 	it("Tournament2", function (done) {
-		ga.optimize = Genetic.Optimize.Minimize;
-		ga.select1 = Genetic.Select1.Tournament2;
-		ga.select2 = Genetic.Select2.Tournament2;
-		ga.crossover = function(mother, father) {
+		genetic.optimize = Genetic.Optimize.Minimize;
+		genetic.select1 = Genetic.Select1.Tournament2;
+		genetic.select2 = Genetic.Select2.Tournament2;
+		genetic.crossover = function(mother, father) {
 			return [mother, father];
 		};
-		ga.seed = function() {
+		genetic.seed = function() {
 			return this.userData["index"]++;
 		};
-		ga.fitness = function(entity) {
+		genetic.fitness = function(entity) {
 			return entity;
 		};
-		ga.notification = function(pop, generation, stats, isFinished) {
+		genetic.notification = function(pop, generation, stats, isFinished) {
 			assert.equal(pop.length, 30);
 			
 			// validate ordering
@@ -100,23 +100,23 @@ describe("Selection", function() {
 			, "crossover": 1.0
 			, "fittestAlwaysSurvives": false
 		};
-		ga.evolve(config, {"index": 0});
+		genetic.evolve(config, {"index": 0});
 	});
 	
 	it("Tournament3", function (done) {
-		ga.optimize = Genetic.Optimize.Maximize;
-		ga.select1 = Genetic.Select1.Tournament3;
-		ga.select2 = Genetic.Select2.Tournament3;
-		ga.crossover = function(mother, father) {
+		genetic.optimize = Genetic.Optimize.Maximize;
+		genetic.select1 = Genetic.Select1.Tournament3;
+		genetic.select2 = Genetic.Select2.Tournament3;
+		genetic.crossover = function(mother, father) {
 			return [mother, father];
 		};
-		ga.seed = function() {
+		genetic.seed = function() {
 			return this.userData["index"]++;
 		};
-		ga.fitness = function(entity) {
+		genetic.fitness = function(entity) {
 			return entity;
 		};
-		ga.notification = function(pop, generation, stats, isFinished) {
+		genetic.notification = function(pop, generation, stats, isFinished) {
 			assert.equal(pop.length, 30);
 			
 			// validate ordering
@@ -135,23 +135,23 @@ describe("Selection", function() {
 			, "crossover": 1.0
 			, "fittestAlwaysSurvives": false
 		};
-		ga.evolve(config, {"index": 0});
+		genetic.evolve(config, {"index": 0});
 	});
 	
 	it("Random", function (done) {
-		ga.optimize = Genetic.Optimize.Maximize;
-		ga.select1 = Genetic.Select1.Random;
-		ga.select2 = Genetic.Select2.Random;
-		ga.crossover = function(mother, father) {
+		genetic.optimize = Genetic.Optimize.Maximize;
+		genetic.select1 = Genetic.Select1.Random;
+		genetic.select2 = Genetic.Select2.Random;
+		genetic.crossover = function(mother, father) {
 			return [mother, father];
 		};
-		ga.seed = function() {
+		genetic.seed = function() {
 			return this.userData["index"]++;
 		};
-		ga.fitness = function(entity) {
+		genetic.fitness = function(entity) {
 			return entity;
 		};
-		ga.notification = function(pop, generation, stats, isFinished) {
+		genetic.notification = function(pop, generation, stats, isFinished) {
 			assert.equal(pop.length, 30);
 			
 			// validate ordering
@@ -170,23 +170,23 @@ describe("Selection", function() {
 			, "crossover": 1.0
 			, "fittestAlwaysSurvives": false
 		};
-		ga.evolve(config, {"index": 0});
+		genetic.evolve(config, {"index": 0});
 	});
 	
 	it("RandomLinearRank", function (done) {
-		ga.optimize = Genetic.Optimize.Minimize;
-		ga.select1 = Genetic.Select1.RandomLinearRank;
-		ga.select2 = Genetic.Select2.RandomLinearRank;
-		ga.crossover = function(mother, father) {
+		genetic.optimize = Genetic.Optimize.Minimize;
+		genetic.select1 = Genetic.Select1.RandomLinearRank;
+		genetic.select2 = Genetic.Select2.RandomLinearRank;
+		genetic.crossover = function(mother, father) {
 			return [mother, father];
 		};
-		ga.seed = function() {
+		genetic.seed = function() {
 			return this.userData["index"]++;
 		};
-		ga.fitness = function(entity) {
+		genetic.fitness = function(entity) {
 			return entity;
 		};
-		ga.notification = function(pop, generation, stats, isFinished) {
+		genetic.notification = function(pop, generation, stats, isFinished) {
 			assert.equal(pop.length, 30);
 			
 			// validate ordering
@@ -206,23 +206,23 @@ describe("Selection", function() {
 			, "crossover": 1.0
 			, "fittestAlwaysSurvives": false
 		};
-		ga.evolve(config, {"index": 0});
+		genetic.evolve(config, {"index": 0});
 	});
 	
 	it("FittestRandom", function (done) {
-		ga.optimize = Genetic.Optimize.Maximize;
-		ga.select1 = Genetic.Select1.RandomLinearRank;
-		ga.select2 = Genetic.Select2.FittestRandom;
-		ga.crossover = function(mother, father) {
+		genetic.optimize = Genetic.Optimize.Maximize;
+		genetic.select1 = Genetic.Select1.RandomLinearRank;
+		genetic.select2 = Genetic.Select2.FittestRandom;
+		genetic.crossover = function(mother, father) {
 			return [mother, father];
 		};
-		ga.seed = function() {
+		genetic.seed = function() {
 			return this.userData["index"]++;
 		};
-		ga.fitness = function(entity) {
+		genetic.fitness = function(entity) {
 			return entity;
 		};
-		ga.notification = function(pop, generation, stats, isFinished) {
+		genetic.notification = function(pop, generation, stats, isFinished) {
 			assert.equal(pop.length, 30);
 			
 			// validate ordering
@@ -244,23 +244,23 @@ describe("Selection", function() {
 			, "crossover": 1.0
 			, "fittestAlwaysSurvives": false
 		};
-		ga.evolve(config, {"index": 0});
+		genetic.evolve(config, {"index": 0});
 	});
 	
 	it("Sequential", function (done) {
-		ga.optimize = Genetic.Optimize.Maximize;
-		ga.select1 = Genetic.Select1.Sequential;
-		ga.select2 = Genetic.Select2.Sequential;
-		ga.crossover = function(mother, father) {
-			return [ga.optimize(mother, father) ? mother : father, ga.optimize(mother, father) ? mother : father];
+		genetic.optimize = Genetic.Optimize.Maximize;
+		genetic.select1 = Genetic.Select1.Sequential;
+		genetic.select2 = Genetic.Select2.Sequential;
+		genetic.crossover = function(mother, father) {
+			return [genetic.optimize(mother, father) ? mother : father, genetic.optimize(mother, father) ? mother : father];
 		};
-		ga.seed = function() {
+		genetic.seed = function() {
 			return this.userData["index"]++;
 		};
-		ga.fitness = function(entity) {
+		genetic.fitness = function(entity) {
 			return entity;
 		};
-		ga.notification = function(pop, generation, stats, isFinished) {
+		genetic.notification = function(pop, generation, stats, isFinished) {
 			assert.equal(pop.length, 30);
 			
 			// validate ordering
@@ -288,7 +288,7 @@ describe("Selection", function() {
 			, "crossover": 1.0
 			, "fittestAlwaysSurvives": false
 		};
-		ga.evolve(config, {"index": 0});
+		genetic.evolve(config, {"index": 0});
 	});
 
 });

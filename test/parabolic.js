@@ -2,12 +2,12 @@ var Genetic = require("../lib/genetic");
 var assert = require("assert");
 
 
-var ga;
+var genetic;
 
 beforeEach(function () {
-	ga = Genetic.create();
-	ga.optimize = Genetic.Optimize.Minimize;
-	ga.seed = function() {
+	genetic = Genetic.create();
+	genetic.optimize = Genetic.Optimize.Minimize;
+	genetic.seed = function() {
 		
 		var a = [];
 		// create coefficients for polynomial with values between (-0.5, 0.5)
@@ -19,7 +19,7 @@ beforeEach(function () {
 		
 		return a;
 	};
-	ga.mutate = function(entity) {
+	genetic.mutate = function(entity) {
 		
 		// allow chromosomal drift with this range (-0.05, 0.05)
 		var drift = ((Math.random()-0.5)*2)*0.05;
@@ -29,7 +29,7 @@ beforeEach(function () {
 		
 		return entity;
 	};
-	ga.crossover = function(mother, father) {
+	genetic.crossover = function(mother, father) {
 
 		// crossover via interpolation
 		function lerp(a, b, p) {
@@ -47,7 +47,7 @@ beforeEach(function () {
 		
 		return [son, daughter];
 	};
-	ga.fitness = function(entity) {
+	genetic.fitness = function(entity) {
 		
 		function evaluatePoly(x) {
 			var s = 0;
@@ -72,7 +72,7 @@ beforeEach(function () {
 		
 		return Math.sqrt(sumSqErr);
 	};
-	ga.generation = function(pop, generation, stats) {
+	genetic.generation = function(pop, generation, stats) {
 		return pop[0].fitness > 0.04;
 	};
 });
@@ -80,11 +80,11 @@ beforeEach(function () {
 
 function solveTest(sel1, sel2, config) {
 	it(sel1 + ", " + sel2, function (done) {
-		ga.select1 = eval(sel1);
-		ga.select2 = eval(sel2);
+		genetic.select1 = eval(sel1);
+		genetic.select2 = eval(sel2);
 		
 		var gen0fitness;
-		ga.notification = function(pop, generation, stats, isFinished) {
+		genetic.notification = function(pop, generation, stats, isFinished) {
 			if (generation == 0) {
 				gen0fitness = pop[0].fitness;
 			}
@@ -101,7 +101,7 @@ function solveTest(sel1, sel2, config) {
 			, "resolution": 3
 		};
 	
-		ga.evolve(config, userData);
+		genetic.evolve(config, userData);
 	});
 }
 

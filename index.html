@@ -9,13 +9,13 @@
 
 <script>
 
-var ga = Genetic.create();
+var genetic = Genetic.create();
 
-ga.optimize = Genetic.Optimize.Maximize;
-ga.select1 = Genetic.Select1.Tournament2;
-ga.select2 = Genetic.Select2.Tournament2;
+genetic.optimize = Genetic.Optimize.Maximize;
+genetic.select1 = Genetic.Select1.Tournament2;
+genetic.select2 = Genetic.Select2.Tournament2;
 
-ga.seed = function() {
+genetic.seed = function() {
 
 	function randomString(len) {
 		var text = "";
@@ -30,7 +30,7 @@ ga.seed = function() {
 	return randomString(this.userData["solution"].length);
 };
 
-ga.mutate = function(entity) {
+genetic.mutate = function(entity) {
 	
 	function replaceAt(str, index, character) {
 		return str.substr(0, index) + character + str.substr(index+character.length);
@@ -41,7 +41,7 @@ ga.mutate = function(entity) {
 	return replaceAt(entity, i, String.fromCharCode(entity.charCodeAt(i) + (Math.floor(Math.random()*2) ? 1 : -1)));
 };
 
-ga.crossover = function(mother, father) {
+genetic.crossover = function(mother, father) {
 
 	// two-point crossover
 	var len = mother.length;
@@ -59,7 +59,7 @@ ga.crossover = function(mother, father) {
 	return [son, daughter];
 };
 
-ga.fitness = function(entity) {
+genetic.fitness = function(entity) {
 	var fitness = 0;
 	
 	var i;
@@ -75,12 +75,12 @@ ga.fitness = function(entity) {
 	return fitness;
 };
 
-ga.generation = function(pop, generation, stats) {
+genetic.generation = function(pop, generation, stats) {
 	// stop running once we've reached the solution
 	return pop[0].entity != this.userData["solution"];
 };
 
-ga.notification = function(pop, generation, stats, isFinished) {
+genetic.notification = function(pop, generation, stats, isFinished) {
 	console.log("avg: " + stats.mean.toPrecision(8) + "  best entity: " + pop[0].entity);
 };
 
@@ -95,7 +95,7 @@ var userData = {
 	"solution": "This is a test to see that it works"
 };
 
-ga.evolve(config, userData);
+genetic.evolve(config, userData);
 
 </script>
 	

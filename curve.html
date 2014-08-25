@@ -9,13 +9,13 @@
 	
 <script>
 
-var ga = Genetic.create();
+var genetic = Genetic.create();
 
-ga.optimize = Genetic.Optimize.Minimize;
-ga.select1 = Genetic.Select1.Tournament2;
-ga.select2 = Genetic.Select2.FittestRandom;
+genetic.optimize = Genetic.Optimize.Minimize;
+genetic.select1 = Genetic.Select1.Tournament2;
+genetic.select2 = Genetic.Select2.FittestRandom;
 
-ga.seed = function() {
+genetic.seed = function() {
 	
 	var a = [];
 	// create coefficients for polynomial with values between (-0.5, 0.5)
@@ -28,7 +28,7 @@ ga.seed = function() {
 	return a;
 };
 
-ga.mutate = function(entity) {
+genetic.mutate = function(entity) {
 	
 	// allow chromosomal drift with this range (-0.05, 0.05)
 	var drift = ((Math.random()-0.5)*2)*0.05;
@@ -39,7 +39,7 @@ ga.mutate = function(entity) {
 	return entity;
 };
 
-ga.crossover = function(mother, father) {
+genetic.crossover = function(mother, father) {
 
 	// crossover via interpolation
 	function lerp(a, b, p) {
@@ -58,7 +58,7 @@ ga.crossover = function(mother, father) {
 	return [son, daughter];
 };
 
-ga.fitness = function(entity) {
+genetic.fitness = function(entity) {
 	
 	// example 3 term polynomial: cx^0 + bx^1 + ax^2
 	function evaluatePoly(x) {
@@ -86,10 +86,10 @@ ga.fitness = function(entity) {
 };
 
 
-ga.generation = function(pop, generation, stats) {
+genetic.generation = function(pop, generation, stats) {
 };
 
-ga.notification = function(pop, generation, stats, isFinished) {
+genetic.notification = function(pop, generation, stats, isFinished) {
 	console.log(generation + "  stddev(" + stats.stdev.toPrecision(6) + ")  avg(" + stats.mean.toPrecision(6) + ")  best entity(" + pop[0].fitness.toPrecision(6) + ")");
 	
 	function poly(entity) {
@@ -118,7 +118,7 @@ var userData = {
 	"terms": 4
 };
 
-ga.evolve(config, userData);
+genetic.evolve(config, userData);
 
 
 

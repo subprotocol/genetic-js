@@ -3,30 +3,30 @@ var Genetic = require("../lib/genetic");
 var assert = require("assert");
 
 
-var ga;
+var genetic;
 
 beforeEach(function () {
-	ga = Genetic.create();
+	genetic = Genetic.create();
 });
 
 
 describe("Config", function() {
 	it("skip", function (done) {
-		ga.optimize = Genetic.Optimize.Maximize;
-		ga.select1 = Genetic.Select1.Tournament2;
-		ga.seed = function() {
+		genetic.optimize = Genetic.Optimize.Maximize;
+		genetic.select1 = Genetic.Select1.Tournament2;
+		genetic.seed = function() {
 			return 0;
 		};
-		ga.mutate = function(entity) {
+		genetic.mutate = function(entity) {
 			return entity;
 		};
-		ga.fitness = function(entity) {
+		genetic.fitness = function(entity) {
 			var fitness = 0;
 			return entity;
 		};
 		
 		var count = 0;
-		ga.notification = function(pop, generation, stats, isFinished) {
+		genetic.notification = function(pop, generation, stats, isFinished) {
 			
 			if (!isFinished) {
 				assert.equal(generation%10, 0);
@@ -45,6 +45,6 @@ describe("Config", function() {
 			, "crossover": 0.0
 			, "skip": 10
 		};
-		ga.evolve(config, {"index": 0});
+		genetic.evolve(config, {"index": 0});
 	});
 });

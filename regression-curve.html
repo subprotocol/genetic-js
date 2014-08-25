@@ -108,13 +108,13 @@ Dataset:
 var graph = new Graph(document.getElementById("scratch"), 10, 10);
 
 
-var ga = Genetic.create();
+var genetic = Genetic.create();
 
-ga.optimize = Genetic.Optimize.Minimize;
-ga.select1 = Genetic.Select1.Tournament2;
-ga.select2 = Genetic.Select2.FittestRandom;
+genetic.optimize = Genetic.Optimize.Minimize;
+genetic.select1 = Genetic.Select1.Tournament2;
+genetic.select2 = Genetic.Select2.FittestRandom;
 
-ga.seed = function() {
+genetic.seed = function() {
 	
 	var a = [];
 	// create coefficients for polynomial with values between (-0.5, 0.5)
@@ -127,7 +127,7 @@ ga.seed = function() {
 	return a;
 };
 
-ga.mutate = function(entity) {
+genetic.mutate = function(entity) {
 	
 	// allow chromosomal drift with this range (-0.05, 0.05)
 	var drift = ((Math.random()-0.5)*2)*0.05;
@@ -138,7 +138,7 @@ ga.mutate = function(entity) {
 	return entity;
 };
 
-ga.crossover = function(mother, father) {
+genetic.crossover = function(mother, father) {
 
 	// crossover via interpolation
 	function lerp(a, b, p) {
@@ -158,7 +158,7 @@ ga.crossover = function(mother, father) {
 };
 
 // example 3 term polynomial: cx^0 + bx^1 + ax^2
-ga.evaluatePoly = function(coefficients, x) {
+genetic.evaluatePoly = function(coefficients, x) {
 	var s = 0;
 	var p = 1;
 	var i;
@@ -170,7 +170,7 @@ ga.evaluatePoly = function(coefficients, x) {
 	return s;
 }
 	
-ga.fitness = function(entity) {
+genetic.fitness = function(entity) {
 	
 	var sumSqErr = 0;
 	var vertices = this.userData["vertices"];
@@ -185,10 +185,10 @@ ga.fitness = function(entity) {
 };
 
 
-ga.generation = function(pop, generation, stats) {
+genetic.generation = function(pop, generation, stats) {
 };
 
-ga.notification = function(pop, generation, stats, isFinished) {
+genetic.notification = function(pop, generation, stats, isFinished) {
 	
 	function poly(entity) {
 		var a = [];
@@ -303,7 +303,7 @@ Graph.prototype.drawFunction = function(coefficients, strokeStyle, lineWidth) {
 	var x;
 	for (x=0;x<xmax;x+=inc) {
 		var cx = x*xstride + bound[3];
-		var cy = bound[2] - ga.evaluatePoly(coefficients, x)*ystride;
+		var cy = bound[2] - genetic.evaluatePoly(coefficients, x)*ystride;
 		
 		if (x == 0) {
 			ctx.moveTo(cx, cy);
@@ -480,7 +480,7 @@ $(document).ready(function () {
 			, "vertices": graph.vertices
 		};
 
-		ga.evolve(config, userData);
+		genetic.evolve(config, userData);
 	});
 	
 	$("#dataset").change(function () {

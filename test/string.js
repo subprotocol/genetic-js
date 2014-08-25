@@ -2,12 +2,12 @@ var Genetic = require("../lib/genetic");
 var assert = require("assert");
 
 
-var ga;
+var genetic;
 
 beforeEach(function () {
-	ga = Genetic.create();
-	ga.optimize = Genetic.Optimize.Maximize;
-	ga.seed = function() {
+	genetic = Genetic.create();
+	genetic.optimize = Genetic.Optimize.Maximize;
+	genetic.seed = function() {
 
 		function randomString(len) {
 			var text = "";
@@ -21,7 +21,7 @@ beforeEach(function () {
 		// create random strings that are equal in length to solution
 		return randomString(this.userData["solution"].length);
 	};
-	ga.mutate = function(entity) {
+	genetic.mutate = function(entity) {
 		
 		function replaceAt(str, index, character) {
 			return str.substr(0, index) + character + str.substr(index+character.length);
@@ -31,7 +31,7 @@ beforeEach(function () {
 		var i = Math.floor(Math.random()*entity.length)		
 		return replaceAt(entity, i, String.fromCharCode(entity.charCodeAt(i) + (Math.floor(Math.random()*2) ? 1 : -1)));
 	};
-	ga.crossover = function(mother, father) {
+	genetic.crossover = function(mother, father) {
 
 		// two-point crossover
 		var len = mother.length;
@@ -48,7 +48,7 @@ beforeEach(function () {
 		
 		return [son, daughter];
 	};
-	ga.fitness = function(entity) {
+	genetic.fitness = function(entity) {
 		var fitness = 0;
 		
 		var i;
@@ -63,7 +63,7 @@ beforeEach(function () {
 
 		return fitness;
 	};
-	ga.generation = function(pop, generation, stats) {
+	genetic.generation = function(pop, generation, stats) {
 		// stop running once we've reached the solution
 		return pop[0].entity != this.userData["solution"];
 	};
@@ -72,9 +72,9 @@ beforeEach(function () {
 
 function solveTest(sel1, sel2, config) {
 	it(sel1 + ", " + sel2, function (done) {
-		ga.select1 = eval(sel1);
-		ga.select2 = eval(sel2);
-		ga.notification = function(pop, generation, stats, isFinished) {
+		genetic.select1 = eval(sel1);
+		genetic.select2 = eval(sel2);
+		genetic.notification = function(pop, generation, stats, isFinished) {
 			if (isFinished) {
 				assert.equal(pop[0].entity, this.userData["solution"]);
 				done();
@@ -85,7 +85,7 @@ function solveTest(sel1, sel2, config) {
 			"solution": "thisisthesolution"
 		};
 	
-		ga.evolve(config, userData);
+		genetic.evolve(config, userData);
 	});
 }
 

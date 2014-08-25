@@ -242,8 +242,8 @@ var Genetic = Genetic || (function(){
 		blobScript += "var Select2 = Serialization.parse(\"" + addslashes(Serialization.stringify(Select2)) + "\");\n";
 		
 		// materialize our ga instance in the worker
-		blobScript += "var ga = Serialization.parse(\"" + addslashes(Serialization.stringify(this)) + "\");\n";
-		blobScript += "onmessage = function(e) { ga.start(); }\n";
+		blobScript += "var genetic = Serialization.parse(\"" + addslashes(Serialization.stringify(this)) + "\");\n";
+		blobScript += "onmessage = function(e) { genetic.start(); }\n";
 		
 		var self = this;
 		
