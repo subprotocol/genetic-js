@@ -95,6 +95,7 @@ Dataset:
 <div>
 	<br/>Solution: <span id="solution">Press 'Compute' Button</span>
 	<br/>Error: <span id="bestfit"></span>
+	<br/>Avg Error per Vertex: <span id="vertexerror"></span>
 	<br/>Generation: <span id="generation"></span>
 	<br/>Average error: <span id="avgbestfit"></span>
 	<br/>error stdev: <span id="errorstdev"></span>
@@ -194,7 +195,13 @@ genetic.notification = function(pop, generation, stats, isFinished) {
 		var a = [];
 		var i;
 		for (i=entity.length-1;i>=0;--i) {
-			a.push(entity[i].toPrecision(2) + "<em><b>x<sup>" + i + "<sup></b></em>");
+			var buf = entity[i].toPrecision(2);
+			if (i > 1)
+				buf += "<em><b>x<sup>" + i + "<sup></b></em>";
+			else if (i == 1)
+				buf += "<em><b>x</b></em>";
+				
+			a.push(buf);
 		}
 		return a.join(" + ");
 	}
@@ -209,9 +216,13 @@ genetic.notification = function(pop, generation, stats, isFinished) {
 	
 	$("#solution").html(poly(pop[0].entity));
 	$("#generation").html(generation+1);
-	$("#bestfit").html(pop[0].fitness.toPrecision(5));
-	$("#avgbestfit").html(stats.mean.toPrecision(5));
-	$("#errorstdev").html(stats.stdev.toPrecision(5));
+	$("#bestfit").html(pop[0].fitness.toPrecision(4))
+	
+	$("#vertexerror").html((pop[0].fitness/graph.vertices.length).toPrecision(4));
+
+	;
+	$("#avgbestfit").html(stats.mean.toPrecision(4));
+	$("#errorstdev").html(stats.stdev.toPrecision(4));
 	
 	
 	var last = graph.last||"";
