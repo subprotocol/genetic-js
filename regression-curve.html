@@ -545,6 +545,14 @@ $(document).ready(function () {
 		graph.drawVertices();
 	});
 	
+	$("#single-selection").change(function () {
+		genetic.select1 = eval($(this).val());
+	});
+	
+	$("#pair-selection").change(function () {
+		genetic.select2 = eval($(this).val());
+	});
+	
 	$("#dataset").val("sinusoidal2").change();
 });
 
