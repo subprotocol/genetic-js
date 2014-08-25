@@ -17,7 +17,7 @@ all: clean
 check:
 	@$(npmbin)/mocha --reporter spec
 
-distcheck: check all
+distcheck: distclean all check
 
 clean:
 	rm -f js/*.js

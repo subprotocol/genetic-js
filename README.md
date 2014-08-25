@@ -26,7 +26,7 @@ The genetic-js interface exposes a few simple concepts and primitives, you just 
 | select1(population)                       | Individual               | Yes        | See [Selection](#selection) section below
 | select2(population)                       | Individual               | Optional   | Selects a pair of individuals from a population. [Selection](#selection)
 | generation(pop, gen, stats)               | Boolean                  | Optional   | Called for each generation.  Return false to terminate end algorithm (ie- if goal state is reached)
-| notification(pop, gen, stats, isFinished) | Void                     | Optional   | Runs in the calling context. All functions other than are run in a web worker.
+| notification(pop, gen, stats, isFinished) | Void                     | Optional   | Runs in the calling context. All functions other than this one are run in a web worker.
 
 
 ## Optimizer
@@ -41,7 +41,7 @@ The optimizer specifies how to rank individuals against each other based on an a
 
 ## Selection
 
-An algorithm can be either genetic or evolutionary depending on which selection operations are used.  An algorithm is evolutionary if it only use a Single (select1) operator¸  If both Single and Pair-wise operations are used (and if crossover is implemented) it is genetic.
+An algorithm can be either genetic or evolutionary depending on which selection operations are used.  An algorithm is evolutionary if it only uses a Single (select1) operator.  If both Single and Pair-wise operations are used (and if crossover is implemented) it is genetic.
 
 
 | Select Type         | Required    | Description
@@ -111,6 +111,10 @@ git clone git@github.com:subprotocol/genetic-js.git && make distcheck
 | make check            | Runs test cases
 | make clean            | Removes files from js/ library
 | make distclean        | Removes both files from js/ library and dev-dependencies
-| make distcheck        | Runs make clean && make
+| make distcheck        | Equivlant to running `make distclean && make && check`
 
+
+## Contributing
+
+Feel free to open issues and send pull-requests.
 
