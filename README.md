@@ -94,12 +94,22 @@ ga.select2 = Genetic.Select2.FittestRandom;
 | fittestAlwaysSurvives | true     | Boolean     | Prevents losing the best fit between generations
 | maxResults            | 100      | Real Number | The maximum number of best-fit results that webworkers will send per notification
 | webWorkers            | true     | Boolean     | Use [Web Workers](http://en.wikipedia.org/wiki/Web_worker) (when available)
+| skip                  | 0        | Real Number | Setting this higher throttles back how frequently `ga.notification` gets called in the main thread.
 
 
 ## Building
-* make
-* make test
-* make clean
-* make distclean
+
+To clone and build Genetic.js issue the following command:
+
+```bash
+git clone git@github.com:subprotocol/genetic-js.git && make
+```
+
+| Command               | Description
+| --------------------- | -----------
+| make                  | Automatically install dev-dependencies, builds project, places library to js/ folder
+| make check            | Runs test cases
+| make clean            | Removes files from js/ library
+| make distclean        | Removes both files from js/ library and dev-dependencies
 
 

@@ -1,4 +1,4 @@
-.PHONY: all test clean distclean
+.PHONY: all check clean distclean
 
 
 version := $(shell node -e "console.log(require('./package.json').version)")
@@ -15,7 +15,7 @@ all:
 	echo "built:";                                           \
 	ls -1 js/* | sed 's/^/  /'
 
-test:
+check:
 	@$(npmbin)/mocha --reporter spec
 
 clean:

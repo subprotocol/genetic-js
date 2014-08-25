@@ -9,7 +9,6 @@ beforeEach(function () {
 	ga = Genetic.create();
 });
 
-
 describe("Clone", function() {
 	
 	it("Array", function () {

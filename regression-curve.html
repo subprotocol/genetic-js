@@ -16,24 +16,88 @@ Dataset:
 <option value="clear">Clear</option>
 <option value="parabola">Parabola</option>
 <option value="linear">Linear (with noise)</option>
-<option value="sinusoidal">Sinusoidal (with noise)</option>
+<option value="sinusoidal">Sinusoidal</option>
+<option value="sinusoidal2">Sinusoidal (with noise)</option>
 </select>
 
-Degree:
+<br/>Iterations:
+<select id="iterations">
+<option>50</option>
+<option>100</option>
+<option>300</option>
+<option selected="selected">500</option>
+<option>1000</option>
+<option>2000</option>
+</select>
+
+
+<br/>Degree:
 <select id="degree">
-<option class="1">0 (constant)</option>
-<option class="2">1 (line)</option>
-<option class="3">2 (parabola)</option>
-<option class="4">3 (polynomial)</option>
+<option value="0">0 (constant)</option>
+<option value="1">1 (line)</option>
+<option value="2">2 (parabola)</option>
+<option value="3">3 (polynomial)</option>
+<option value="4" selected="selected">4 (polynomial)</option>
 </select>
 
-<button id="solve">Solve</button>
+
+<br/>Mutation:
+<select id="mutation">
+<option>0.0</option>
+<option>0.1</option>
+<option>0.2</option>
+<option>0.3</option>
+<option>0.4</option>
+<option>0.5</option>
+<option>0.6</option>
+<option>0.7</option>
+<option>0.8</option>
+<option>0.9</option>
+<option selected="selected">1.0</option>
+</select>
+ with 
+<select id="single-selection">
+<option>Genetic.Select1.Tournament2</option>
+<option>Genetic.Select1.Tournament3</option>
+<option>Genetic.Select1.Fittest</option>
+<option>Genetic.Select1.Random</option>
+<option>Genetic.Select1.RandomLinearRank</option>
+<option>Genetic.Select1.Sequential</option>
+</select>
+
+<br/>Crossover:
+<select id="crossover">
+<option>0.0</option>
+<option>0.1</option>
+<option>0.2</option>
+<option>0.3</option>
+<option selected="selected">0.4</option>
+<option>0.5</option>
+<option>0.6</option>
+<option>0.7</option>
+<option>0.8</option>
+<option>0.9</option>
+<option>1.0</option>
+</select>
+ with 
+<select id="pair-selection">
+<option>Genetic.Select2.Tournament2</option>
+<option>Genetic.Select2.Tournament3</option>
+<option>Genetic.Select2.Random</option>
+<option>Genetic.Select2.RandomLinearRank</option>
+<option>Genetic.Select2.Sequential</option>
+<option selected="selected">Genetic.Select2.FittestRandom</option>
+</select>
+
+
+<br/><button id="solve">Compute</button>
 
 <div>
-	Solution: <span id="solution">Press 'Solve'</span>
-</div>
-<div>
-	Generation: <span id="generation">0</span>
+	<br/>Solution: <span id="solution">Press 'Compute' Button</span>
+	<br/>Error: <span id="bestfit"></span>
+	<br/>Generation: <span id="generation"></span>
+	<br/>Average error: <span id="avgbestfit"></span>
+	<br/>error stdev: <span id="errorstdev"></span>
 </div>
 
 <canvas id="scratch" style="width: 800px; height: 500px; cursor: crosshair;"></canvas>
@@ -125,7 +189,6 @@ ga.generation = function(pop, generation, stats) {
 };
 
 ga.notification = function(pop, generation, stats, isFinished) {
-	//console.log(generation + "  stddev(" + stats.stdev.toPrecision(6) + ")  avg(" + stats.mean.toPrecision(6) + ")  best entity(" + pop[0].fitness.toPrecision(6) + ")");
 	
 	function poly(entity) {
 		var a = [];
@@ -144,6 +207,12 @@ ga.notification = function(pop, generation, stats, isFinished) {
 		graph.solutions = [];
 	}
 	
+	$("#solution").html(poly(pop[0].entity));
+	$("#generation").html(generation+1);
+	$("#bestfit").html(pop[0].fitness.toPrecision(5));
+	$("#avgbestfit").html(stats.mean.toPrecision(5));
+	$("#errorstdev").html(stats.stdev.toPrecision(5));
+	
 	
 	var last = graph.last||"";
 	
@@ -155,8 +224,7 @@ ga.notification = function(pop, generation, stats, isFinished) {
 			graph.last = str;
 		}
 		
-		$("#solution").html(poly(pop[0].entity));
-		$("#generation").html(generation+1);
+		
 
 		graph.draw();
 		
@@ -171,7 +239,7 @@ ga.notification = function(pop, generation, stats, isFinished) {
 			var r = Math.round(lerp(90,255,p));
 			var g = Math.round(lerp(0,255,0));
 			var b = Math.round(lerp(200,50,p));
-			var alpha = p;
+			var alpha = lerp(0.5,1,p);
 			var strokeStyle = "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
 			var lineWidth = Math.floor(lerp(10,1,p));
 
@@ -400,12 +468,13 @@ $(document).ready(function () {
 	
 	$("#solve").click(function () {
 		var config = {
-			"iterations": 250
+			"iterations": $("#iterations").val()
 			, "size": 250
-			, "crossover": 0.3
-			, "mutation": 1.0
+			, "crossover": parseFloat($("#crossover").val())
+			, "mutation": parseFloat($("#mutation").val())
+			, "skip": 10
 		};
-
+		
 		var userData = {
 			"terms": parseInt($("#degree").val())+1
 			, "vertices": graph.vertices
@@ -416,6 +485,11 @@ $(document).ready(function () {
 	
 	$("#dataset").change(function () {
 		var v = $(this).val();
+		
+		
+		$("#dataset option:selected").prop("selected", false);
+		$("#dataset option:first").prop("selected", "selected");
+		
 		if (v == "") {
 			return;
 		} else if (v == "clear") {
@@ -429,8 +503,8 @@ $(document).ready(function () {
 			graph.vertices = [];
 			var x;
 			var b = Math.random()*3;
-			var m = Math.random();
-			var n = 50;
+			var m = Math.random()+0.5;
+			var n = 100;
 			for (i=0;i<n;++i) {
 				var cx = Math.random()*10;
 				var cy = m*cx + b + (Math.random()-0.5)*2;
@@ -439,10 +513,20 @@ $(document).ready(function () {
 		} else if (v == "sinusoidal") {
 			graph.vertices = [];
 			var n = 20;
+			var off = Math.random()*2*3.1415927;
 			var stride = 10/n;
 			var i;
 			for (i=0;i<n;++i) {
-				graph.vertices.push([i*stride,Math.sin((i/n)*2*3.1415627)*3 + 5]);
+				graph.vertices.push([i*stride,Math.sin((off + i/n)*2*3.1415627)*3 + 5]);
+			}
+		} else if (v == "sinusoidal2") {
+			graph.vertices = [];
+			var n = 200;
+			var off = Math.random()*2*3.1415927;
+			var stride = 10/n;
+			var i;
+			for (i=0;i<n;++i) {
+				graph.vertices.push([i*stride,Math.sin((off + i/n)*2*3.1415627)*3 + 5 + (Math.random()-0.5)*2]);
 			}
 		}
 		
@@ -450,9 +534,7 @@ $(document).ready(function () {
 		graph.drawVertices();
 	});
 	
-
-	graph.draw();
-	graph.drawVertices();
+	$("#dataset").val("sinusoidal2").change();
 });
 
 
