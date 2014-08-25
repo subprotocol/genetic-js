@@ -102,6 +102,7 @@ var Genetic = Genetic || (function(){
 			, "fittestAlwaysSurvives": true
 			, "maxResults": 100
 			, "webWorkers": true
+			, "skip": 0
 		};
 		
 		this.userData = {};
@@ -155,8 +156,12 @@ var Genetic = Genetic || (function(){
 				var r = this.generation ? this.generation(pop, i, stats) : true;
 				var isFinished = (typeof r != "undefined" && !r) || (i == this.configuration.iterations-1);
 				
-				if (this.notification)
+				if (
+					this.notification
+					&& (isFinished || this.configuration["skip"] == 0 || i%this.configuration["skip"] == 0)
+				) {
 					this.sendNotification(pop.slice(0, this.maxResults), i, stats, isFinished);
+				}
 					
 				if (isFinished)
 					break;
