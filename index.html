@@ -4,8 +4,25 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<title>genetic-js</title>
 	<script src="lib/genetic.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 </head>
 <body>
+
+<textarea id="quote" style="width: 300px; height: 100px;">Insanity is doing the same thing over and over again and expecting different results</textarea>
+
+<button id="solve">Solve</button>
+
+<table id="results">
+	<thead>
+		<tr>
+			<th>Generation</th>
+			<th>Fitness</th>
+			<th>Solution</th>
+		</tr>
+	</thead>
+	<tbody style="font-family: monospace;">
+	</tbody>
+</table>
 
 <script>
 
@@ -81,21 +98,64 @@ genetic.generation = function(pop, generation, stats) {
 };
 
 genetic.notification = function(pop, generation, stats, isFinished) {
-	console.log("avg: " + stats.mean.toPrecision(8) + "  best entity: " + pop[0].entity);
+
+	function lerp(a, b, p) {
+		return a + (b-a)*p;
+	}
+	
+	var value = pop[0].entity;
+	this.last = this.last||value;
+	
+	if (pop != 0 && value == this.last)
+		return;
+	
+	
+	var solution = [];
+	var i;
+	for (i=0;i<value.length;++i) {
+		var diff = value.charCodeAt(i) - this.last.charCodeAt(i);
+		var style = "background: transparent;";
+		if (diff > 0) {
+			style = "background: rgb(0,200,50); color: #fff;";
+		} else if (diff < 0) {
+			style = "background: rgb(0,100,50); color: #fff;";
+		}
+
+		solution.push("<span style=\"" + style + "\">" + value[i] + "</span>");
+	}
+	
+	var buf = "";
+	buf += "<tr>";
+	buf += "<td>" + generation + "</td>";
+	buf += "<td>" + pop[0].fitness.toPrecision(5) + "</td>";
+	buf += "<td>" + solution.join("") + "</td>";
+	buf += "</tr>";
+	$("#results tbody").prepend(buf);
+	
+	this.last = value;
 };
 
-var config = {
-	"iterations": 4000
-	, "size": 250
-	, "crossover": 0.3
-	, "mutation": 0.3
-};
 
-var userData = {
-	"solution": "This is a test to see that it works"
-};
+$(document).ready(function () {
+	$("#solve").click(function () {
+		
+		$("#results tbody").html("");
+		
+		var config = {
+			"iterations": 4000
+			, "size": 250
+			, "crossover": 0.3
+			, "mutation": 0.3
+			, "skip": 20
+		};
 
-genetic.evolve(config, userData);
+		var userData = {
+			"solution": $("#quote").val()
+		};
+
+		genetic.evolve(config, userData);
+	});
+});
 
 </script>
 	
