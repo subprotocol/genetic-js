@@ -258,7 +258,7 @@ var Genetic = Genetic || (function(){
 			worker.onerror = function(e) {
 				alert('ERROR: Line ' + e.lineno + ' in ' + e.filename + ': ' + e.message);
 			};
-			worker.postMessage();
+			worker.postMessage("");
 		} else {
 			// simulate webworker
 			(function(){
