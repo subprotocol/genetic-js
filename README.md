@@ -2,6 +2,11 @@
 
 Advanced genetic and evolutionary algorithm library written in Javascript by [Sub Protocol](http://subprotocol.com/).
 
+#### Examples
+
+* [Genetic Phrase Solver](http://subprotocol.com/system/genetic-hello-world.html)
+* [Genetic Curve Fitter](http://subprotocol.com/system/genetic-regression-curve.html)
+
 
 #### Rational
 
