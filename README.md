@@ -1,4 +1,4 @@
-# genetic-js
+# Genetic.js
 
 Advanced genetic and evolutionary algorithm library written in Javascript by [Sub Protocol](http://subprotocol.com/).
 
@@ -20,7 +20,9 @@ Have fun optimizing all your optimizations!
 
 #### Install
 
-```npm install genetic-js```
+```bash
+npm install genetic-js
+```
 
 
 ## Population Functions
