@@ -2,11 +2,6 @@
 
 Advanced genetic and evolutionary algorithm library written in Javascript by [Sub Protocol](http://subprotocol.com/).
 
-#### Examples
-
-* [Genetic Phrase Solver](http://subprotocol.com/system/genetic-hello-world.html)
-* [Genetic Curve Fitter](http://subprotocol.com/system/genetic-regression-curve.html)
-
 
 #### Rational
 
@@ -15,6 +10,17 @@ The existing Javascript GA/EP library landscape could collectively be summed up 
 Until now, no such thing existed. Now you can have my cake, and optimize it too. Is it perfect? *Probably*. Regardless, this library is my gift to you.
 
 Have fun optimizing all your optimizations!
+
+
+#### Examples
+
+* [Genetic Phrase Solver](http://subprotocol.com/system/genetic-hello-world.html)
+* [Genetic Curve Fitter](http://subprotocol.com/system/genetic-regression-curve.html)
+
+
+#### Install
+
+```npm install genetic-js```
 
 
 ## Population Functions
