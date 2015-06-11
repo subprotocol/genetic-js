@@ -160,7 +160,7 @@ var Genetic = Genetic || (function(){
 					this.notification
 					&& (isFinished || this.configuration["skip"] == 0 || i%this.configuration["skip"] == 0)
 				) {
-					this.sendNotification(pop.slice(0, this.maxResults), i, stats, isFinished);
+					this.sendNotification(pop.slice(0, this.configuration["maxResults"]), i, stats, isFinished);
 				}
 					
 				if (isFinished)
