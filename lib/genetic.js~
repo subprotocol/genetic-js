@@ -110,7 +110,9 @@ var Genetic = Genetic || (function(){
 		this.mapFitnessAsync = function(entities, callback) {
 			var self = this;
 
-			var scores = [];
+			var scores = entities.map(function() {
+				return null;
+			});
 			var nbScores = 0;
 
 			entities.forEach(function(entity, i) {
@@ -123,12 +125,14 @@ var Genetic = Genetic || (function(){
 					}
 				};
 
-				// Supports fitness function sync or async based on number of expected arguments
-				if (self.fitness.length === 1) {
-					setScore(self.fitness(entity));
-				} else {
-					self.fitness(entity, setScore);
-				}
+				setTimeout(function() {
+					// Supports fitness function sync or async based on number of expected arguments
+					if (self.fitness.length === 1) {
+						setScore(self.fitness(entity));
+					} else {
+						self.fitness(entity, setScore);
+					}
+				}, 0);
 			});
 		};
 
@@ -137,16 +141,17 @@ var Genetic = Genetic || (function(){
 			var results = [];
 
 			var recursion = function(i) {
-				if(i < nb) {
-					func.call(self, i, function recursionCallback() {
-						recursion(i + 1);
-					});
-				}
+				setTimeout(function() {
+					if(i < nb) {
+						func.call(self, function recursionCallback() {
+							recursion(i + 1);
+						});
+					}
+				}, 0);
 			};
 
 			recursion(0);
 		};
-
 		this.start = function() {
 			
 			var i;
@@ -162,7 +167,7 @@ var Genetic = Genetic || (function(){
 				this.entities.push(Clone(this.seed()));
 			}
 			
-			this.seriesAsync(this.configuration.iterations, function runGeneration(i, generationCallback){
+			this.seriesAsync(this.configuration.iterations, function runGeneration(generationCallback){
 				// reset for each generation
 				self.internalGenState = {};
 				
