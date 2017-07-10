@@ -108,6 +108,7 @@ genetic.select2 = Genetic.Select2.FittestRandom;
 | maxResults            | 100      | Real Number | The maximum number of best-fit results that webworkers will send per notification
 | webWorkers            | true     | Boolean     | Use [Web Workers](http://en.wikipedia.org/wiki/Web_worker) (when available)
 | skip                  | 0        | Real Number | Setting this higher throttles back how frequently `genetic.notification` gets called in the main thread.
+| runInThread           | false    | Boolean     | Runs everything in the same thread, without using webworkers.
 
 
 ## Building

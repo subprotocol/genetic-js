@@ -47,4 +47,22 @@ describe("Config", function() {
 		};
 		genetic.evolve(config, {"index": 0});
 	});
+
+	it("works with runInThread", function() {
+	
+	var config = {
+		"iterations": 2000
+		, "size": 20
+		, "crossover": 0.4
+		, "mutation": 0.3
+		, "runInThread": true
+	};
+	
+	var k;
+	for (k in Genetic.Select1) {
+		for (j in Genetic.Select2) {
+			solveTest("Genetic.Select1."+k, "Genetic.Select2."+j, config);
+		}
+	};
+	
 });
