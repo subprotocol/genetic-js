@@ -5,9 +5,9 @@ window.Genetic = require('./genetic');
 },{"./genetic":2}],2:[function(require,module,exports){
 
 var Genetic = Genetic || (function(){
-	
+
 	'use strict';
-	
+
 	// facilitates communcation between web workers
 	var Serialization = {
 		"stringify": function (obj) {
@@ -25,19 +25,19 @@ var Genetic = Genetic || (function(){
 			});
 		}
 	};
-	
+
 	var Clone = function(obj) {
 		if (obj == null || typeof obj != "object")
 			return obj;
-		
+
 		return JSON.parse(JSON.stringify(obj));
 	};
-	
+
 	var Optimize = {
 		"Maximize": function (a, b) { return a >= b; }
 		, "Minimize": function (a, b) { return a < b; }
 	};
-	
+
 	var Select1 = {
 		"Tournament2": function(pop) {
 			var n = pop.length;
@@ -64,7 +64,7 @@ var Genetic = Genetic || (function(){
 			return pop[(this.internalGenState["seq"]++)%pop.length].entity;
 		}
 	};
-	
+
 	var Select2 = {
 		"Tournament2": function(pop) {
 			return [Select1.Tournament2.call(this, pop), Select1.Tournament2.call(this, pop)];
@@ -80,9 +80,9 @@ var Genetic = Genetic || (function(){
 			return [Select1.Fittest.call(this, pop), Select1.Random.call(this, pop)];
 		}
 	};
-	
+
 	function Genetic() {
-		
+
 		// population
 		this.fitness = null;
 		this.seed = null;
@@ -93,7 +93,7 @@ var Genetic = Genetic || (function(){
 		this.optimize = null;
 		this.generation = null;
 		this.notification = null;
-		
+
 		this.configuration = {
 			"size": 250
 			, "crossover": 0.9
@@ -104,48 +104,48 @@ var Genetic = Genetic || (function(){
 			, "webWorkers": true
 			, "skip": 0
 		};
-		
+
 		this.userData = {};
 		this.internalGenState = {};
-		
+
 		this.entities = [];
-		
+
 		this.usingWebWorker = false;
-		
-		this.start = function() {
-			
-			var i;
+
+		this.doIteration = function(i){
 			var self = this;
-			
 			function mutateOrNot(entity) {
 				// applies mutation based on mutation probability
 				return Math.random() <= self.configuration.mutation && self.mutate ? self.mutate(Clone(entity)) : entity;
 			}
-			
-			// seed the population
-			for (i=0;i<this.configuration.size;++i)  {
-				this.entities.push(Clone(this.seed()));
-			}
-			
-			for (i=0;i<this.configuration.iterations;++i) {
-				// reset for each generation
-				this.internalGenState = {};
-				
-				// score and sort
-				var pop = this.entities
-					.map(function (entity) {
-						return {"fitness": self.fitness(entity), "entity": entity };
-					})
-					.sort(function (a, b) {
-						return self.optimize(a.fitness, b.fitness) ? -1 : 1;
-					});
-				
+
+			//check for termination
+			if(i >= this.configuration.iterations) return;
+			i++;
+
+			// reset for each generation
+			this.internalGenState = {};
+
+			// score entities with support for returning promises
+			var promises = this.entities
+				.map(function(entity){
+					return Promise.resolve(self.fitness(entity))
+						.then(function(fitness){
+							return { "fitness": fitness, "entity": entity };
+						})
+				})
+			//wait for all fitness functions to return & then sort
+			return Promise.all(promises).then(function(pop){
+				return pop.sort(function (a, b) {
+					return self.optimize(a.fitness, b.fitness) ? -1 : 1;
+				})
+			}).then((function(pop){
 				// generation notification
 				var mean = pop.reduce(function (a, b) { return a + b.fitness; }, 0)/pop.length;
 				var stdev = Math.sqrt(pop
 					.map(function (a) { return (a.fitness - mean) * (a.fitness - mean); })
 					.reduce(function (a, b) { return a+b; }, 0)/pop.length);
-					
+
 				var stats = {
 					"maximum": pop[0].fitness
 					, "minimum": pop[pop.length-1].fitness
@@ -153,43 +153,51 @@ var Genetic = Genetic || (function(){
 					, "stdev": stdev
 				};
 
-				var r = this.generation ? this.generation(pop.slice(0, this.configuration["maxResults"]), i, stats) : true;
+				//check for termination
+				var r = this.generation ? this.generation(pop, i, stats) : true;
 				var isFinished = (typeof r != "undefined" && !r) || (i == this.configuration.iterations-1);
-				
+
+				//call notification
 				if (
 					this.notification
 					&& (isFinished || this.configuration["skip"] == 0 || i%this.configuration["skip"] == 0)
 				) {
 					this.sendNotification(pop.slice(0, this.configuration["maxResults"]), i, stats, isFinished);
 				}
-					
-				if (isFinished)
-					break;
-				
+
+				if (isFinished) return Promise.resolve();
+
 				// crossover and mutate
 				var newPop = [];
-				
 				if (this.configuration.fittestAlwaysSurvives) // lets the best solution fall through
 					newPop.push(pop[0].entity);
-				
-				while (newPop.length < self.configuration.size) {
+				while (newPop.length < this.configuration.size) {
 					if (
 						this.crossover // if there is a crossover function
 						&& Math.random() <= this.configuration.crossover // base crossover on specified probability
-						&& newPop.length+1 < self.configuration.size // keeps us from going 1 over the max population size
+						&& newPop.length+1 < this.configuration.size // keeps us from going 1 over the max population size
 					) {
 						var parents = this.select2(pop);
 						var children = this.crossover(Clone(parents[0]), Clone(parents[1])).map(mutateOrNot);
 						newPop.push(children[0], children[1]);
 					} else {
-						newPop.push(mutateOrNot(self.select1(pop)));
+						newPop.push(mutateOrNot(this.select1(pop)));
 					}
 				}
-				
 				this.entities = newPop;
-			}
+			}).bind(this)).then(function(){
+				return self.doIteration(i);
+			})
 		}
-		
+
+		this.start = function() {
+			// seed the population
+			for (var i=0;i<this.configuration.size;++i)  {
+				this.entities.push(Clone(this.seed()));
+			}
+			return this.doIteration(0);
+		}
+
 		this.sendNotification = function(pop, generation, stats, isFinished) {
 			var response = {
 				"pop": pop.map(Serialization.stringify)
@@ -197,56 +205,56 @@ var Genetic = Genetic || (function(){
 				, "stats": stats
 				, "isFinished": isFinished
 			};
-			
-			
+
+
 			if (this.usingWebWorker) {
 				postMessage(response);
 			} else {
 				// self declared outside of scope
 				self.notification(response.pop.map(Serialization.parse), response.generation, response.stats, response.isFinished);
 			}
-			
+
 		};
 	}
-	
+
 	Genetic.prototype.evolve = function(config, userData) {
-		
+
 		var k;
 		for (k in config) {
 			this.configuration[k] = config[k];
 		}
-		
+
 		for (k in userData) {
 			this.userData[k] = userData[k];
 		}
-		
+
 		// determine if we can use webworkers
 		this.usingWebWorker = this.configuration.webWorkers
 			&& typeof Blob != "undefined"
 			&& typeof Worker != "undefined"
 			&& typeof window.URL != "undefined"
 			&& typeof window.URL.createObjectURL != "undefined";
-		
+
 		function addslashes(str) {
 			return str.replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
 		}
-			
+
 		// bootstrap webworker script
 		var blobScript = "'use strict'\n";
 		blobScript += "var Serialization = {'stringify': " + Serialization.stringify.toString() + ", 'parse': " + Serialization.parse.toString() + "};\n";
 		blobScript += "var Clone = " + Clone.toString() + ";\n";
-		
+
 		// make available in webworker
 		blobScript += "var Optimize = Serialization.parse(\"" + addslashes(Serialization.stringify(Optimize)) + "\");\n";
 		blobScript += "var Select1 = Serialization.parse(\"" + addslashes(Serialization.stringify(Select1)) + "\");\n";
 		blobScript += "var Select2 = Serialization.parse(\"" + addslashes(Serialization.stringify(Select2)) + "\");\n";
-		
+
 		// materialize our ga instance in the worker
 		blobScript += "var genetic = Serialization.parse(\"" + addslashes(Serialization.stringify(this)) + "\");\n";
 		blobScript += "onmessage = function(e) { genetic.start(); }\n";
-		
+
 		var self = this;
-		
+
 		if (this.usingWebWorker) {
 			// webworker
 			var blob = new Blob([blobScript]);
@@ -268,7 +276,7 @@ var Genetic = Genetic || (function(){
 			})();
 		}
 	}
-	
+
 	return {
 		"create": function() {
 			return new Genetic();
@@ -277,7 +285,7 @@ var Genetic = Genetic || (function(){
 		, "Optimize": Optimize
 		, "Clone": Clone
 	};
-	
+
 })();
 
 
