@@ -108,7 +108,8 @@ genetic.select2 = Genetic.Select2.FittestRandom;
 | maxResults            | 100      | Real Number | The maximum number of best-fit results that webworkers will send per notification
 | webWorkers            | true     | Boolean     | Use [Web Workers](http://en.wikipedia.org/wiki/Web_worker) (when available)
 | skip                  | 0        | Real Number | Setting this higher throttles back how frequently `genetic.notification` gets called in the main thread.
-
+| workerPath            | ''       | String      | NodeJS only, set a custom fitness worker path
+| workersCount          | 0        | number      | NodeJS only, set how many multi thread workers to use, set 0 to disable multi threading
 
 ## Building
 
