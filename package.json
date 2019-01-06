@@ -24,9 +24,6 @@
   "devDependencies": {
     "browserify": "~5.10.0",
     "uglify-js": "~2.4.15",
-    "mocha": "~1.21.4"
-  },
-  "dependencies": {
-    "prettier": "^1.15.3"
+	"mocha": "~1.21.4"
   }
 }
