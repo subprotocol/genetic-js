@@ -1,29 +1,25 @@
-# Genetic.js
+# Genetic-multithread.js
 
 Advanced genetic and evolutionary algorithm library written in Javascript by [Sub Protocol](http://subprotocol.com/).
 
+### Changes from original version
+This is a modified genetic repo optimized for nodejs with multi thread performance optimization.
+it uses experimental feature worker_threads
+This version only supports genetic with node js, doesn't support running in browser.
 
-#### Rational
+requires to run program with `node --experimental-worker`
 
-The existing Javascript GA/EP library landscape could collectively be summed up as, meh. All that I required to take over the world was a lightweight, performant, feature-rich, nodejs + browser compatible, unit tested, and easily hackable GA/EP library.  Seamless [Web Worker](http://en.wikipedia.org/wiki/Web_worker) support would be the icing on my cake.
-
-Until now, no such thing existed. Now you can have my cake, and optimize it too. Is it perfect? *Probably*. Regardless, this library is my gift to you.
-
-Have fun optimizing all your optimizations!
 
 
 #### Examples
 
-* [Genetic Phrase Solver](http://subprotocol.com/system/genetic-hello-world.html)
-* [Genetic Curve Fitter](http://subprotocol.com/system/genetic-regression-curve.html)
-
+example in nodejs ```node --experimental-worker  examples/nodeJsFitting.js```
 
 #### Install
 
 ```bash
-npm install genetic-js
+npm install genetic-js-multithread
 ```
-
 
 ## Population Functions
 
@@ -105,8 +101,6 @@ genetic.select2 = Genetic.Select2.FittestRandom;
 | mutation              | 0.2      | [0.0, 1.0]  | Probability of mutation
 | iterations            | 100      | Real Number | Maximum number of iterations before finishing
 | fittestAlwaysSurvives | true     | Boolean     | Prevents losing the best fit between generations
-| maxResults            | 100      | Real Number | The maximum number of best-fit results that webworkers will send per notification
-| webWorkers            | true     | Boolean     | Use [Web Workers](http://en.wikipedia.org/wiki/Web_worker) (when available)
 | skip                  | 0        | Real Number | Setting this higher throttles back how frequently `genetic.notification` gets called in the main thread.
 | workerPath            | ''       | String      | NodeJS only, set a custom fitness worker path
 | workersCount          | 0        | number      | NodeJS only, set how many multi thread workers to use, set 0 to disable multi threading
@@ -121,14 +115,8 @@ git clone git@github.com:subprotocol/genetic-js.git && make distcheck
 
 | Command               | Description
 | --------------------- | -----------
-| make                  | Automatically install dev-dependencies, builds project, places library to js/ folder
-| make check            | Runs test cases
-| make clean            | Removes files from js/ library
-| make distclean        | Removes both files from js/ library and dev-dependencies
-| make distcheck        | Equivlant to running `make distclean && make && check`
-
+| make                  | Automatically install dev-dependencies
 
 ## Contributing
 
 Feel free to open issues and send pull-requests.
-

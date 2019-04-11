@@ -50,22 +50,22 @@ const Genetic = require('../lib/genetic');
     var s = 0;
     var p = 1;
     var i;
-    for (i=0;i<coefficients.length;++i) {
-      s += p*coefficients[i];
+    for (i = 0; i < coefficients.length; ++i) {
+      s += p * coefficients[i];
       p *= x;
     }
 
     return s;
-  }
+  };
 
   genetic.crossover = function(mother, father) {
     // crossover via interpolation
     function lerp(a, b, p) {
-      return a + (b-a)*p;
+      return a + (b - a) * p;
     }
 
     var len = mother.length;
-    var i = Math.floor(Math.random()*len);
+    var i = Math.floor(Math.random() * len);
     var r = Math.random();
     var son = [].concat(father);
     var daughter = [].concat(mother);
@@ -78,12 +78,12 @@ const Genetic = require('../lib/genetic');
 
   genetic.fitness = function(entity) {
     var sumSqErr = 0;
-    var vertices = this.userData["vertices"];
+    var vertices = this.userData['vertices'];
 
     var i;
-    for (i=0;i<vertices.length;++i) {
+    for (i = 0; i < vertices.length; ++i) {
       var err = this.evaluatePoly(entity, vertices[i][0]) - vertices[i][1];
-      sumSqErr += err*err;
+      sumSqErr += err * err;
     }
     return Math.sqrt(sumSqErr);
   };
@@ -95,13 +95,13 @@ const Genetic = require('../lib/genetic');
   };
 
   function generateSinusoidalVertices() {
-    const  vertices = [];
+    const vertices = [];
     var n = 20;
-    var off = Math.random()*2*3.1415927;
-    var stride = 10/n;
+    var off = Math.random() * 2 * 3.1415927;
+    var stride = 10 / n;
     var i;
-    for (i=0;i<n;++i) {
-      vertices.push([i*stride,Math.sin((off + i/n)*2*3.1415627)*3 + 5]);
+    for (i = 0; i < n; ++i) {
+      vertices.push([i * stride, Math.sin((off + i / n) * 2 * 3.1415627) * 3 + 5]);
     }
     return vertices;
   }
@@ -111,16 +111,14 @@ const Genetic = require('../lib/genetic');
     size: 2000,
     workerPath: __dirname + '/nodeJsFittingWorker.js',
     // toogle workerCount based on your CPU core count and see the differences
-    workersCount: 0,
+    workersCount: 2,
   };
 
   var userData = {
-    "terms": 5
-    , "vertices": generateSinusoidalVertices()
+    terms: 5,
+    vertices: generateSinusoidalVertices(),
   };
   const startTime = Date.now();
   genetic.evolve(config, userData);
   console.log(`all completed, took ${Date.now() - startTime}ms`);
 })();
-
-
