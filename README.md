@@ -48,8 +48,8 @@ The optimizer specifies how to rank individuals against each other based on an a
 
 | Optimizer                  | Description
 | -------------------------- | -----------
-| Genetic.Optimize.Minimizer | The smaller fitness score of two individuals is best
-| Genetic.Optimize.Maximizer | The greater fitness score of two individuals is best
+| Genetic.Optimize.Minimize | The smaller fitness score of two individuals is best
+| Genetic.Optimize.Maximize | The greater fitness score of two individuals is best
 
 
 ## Selection
