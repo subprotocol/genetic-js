@@ -153,14 +153,14 @@ var Genetic = Genetic || (function(){
 					, "stdev": stdev
 				};
 
-				var r = this.generation ? this.generation(pop.slice(0, this.configuration["maxResults"]), i, stats) : true;
+				var r = this.generation ? this.generation(pop.slice(0, this.configuration.maxResults), i, stats) : true;
 				var isFinished = (typeof r != "undefined" && !r) || (i == this.configuration.iterations-1);
 				
 				if (
 					this.notification
 					&& (isFinished || this.configuration["skip"] == 0 || i%this.configuration["skip"] == 0)
 				) {
-					this.sendNotification(pop.slice(0, this.configuration["maxResults"]), i, stats, isFinished);
+					this.sendNotification(pop.slice(0, this.configuration.maxResults), i, stats, isFinished);
 				}
 					
 				if (isFinished)
